@@ -1,9 +1,28 @@
-Project Name: WebBoard
+Project Name: WebBoard-An Online Interactive Tutoring System
 
-Group Memebers:
+Group Members:
 ASHWIN VASANI (akvasani@asu.edu)
 RAVINSINGH JAIN (rvjain@asu.edu)
 SAGAR KALBURGI (skalburg@asu.edu)
 
 Mentor:
 HUIJUN WU (Huijun.Wu@asu.edu)
+
+Abstract -
+
+This project is to meet the necessary requirements of online lectures and to
+make it easier for the instructors and the students to communicate more
+effectively and interactively, especially for remote students. WebBoard is an
+integrated tutoring application. During the presentation, the instructor can
+write on the application interface called WebBoard, the content of which is
+replicated to all the students in their WebBoards. It comes with a Question &
+Answer feature which allows students to ask questions in a manner that can
+be accessed by students participating in the class. The instructor can easily
+switch among the slides, video and the WebBoard. While elaborating on the
+concepts, the instructor can annotate the content of slides, without modifying
+them which makes it easier for students to understand the concepts. The
+lectures are recorded in the class rooms and are available to all the students
+later on the cloud.
+
+Keywords -- webRTC, Vlab, Node.js, Video conferencing, Screen sharing, WebBoard,
+	 tutoring, VP8
