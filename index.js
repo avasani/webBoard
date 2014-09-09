@@ -4,8 +4,6 @@ var app = express(), bodyParser = require('body-parser');
 app.use(bodyParser());
 var http = require('http');
 var httpServer = http.Server(app);
-app.set('port', (process.env.PORT || 5000))
-app.listen((process.env.PORT || 5000));
 
 console.log("dir name: ",__dirname);
 app.use(express.static(__dirname+'/www'));
@@ -20,14 +18,16 @@ app.get('/hi', function(req, res) {
 	console.log("hi");
 });
 
-var x, y, tx, ty;
+var x[10000], y[10000], tx[10000], ty[10000];
+var idx;
 app.post('/data', function(req, resp){
 
 	console.log(JSON.stringify(req.body));
-	x = req.body.x;
-	y = req.body.y;
-	tx = req.body.tx;
-	ty = req.body.ty;
+	x[idx] = req.body.x;
+	y[idx] = req.body.y;
+	tx[idx] = req.body.tx;
+	ty[idx] = req.body.ty;
+	idx++;
 	resp.writeHead(200);
 	resp.write('{"success":0}');
 	resp.end();
@@ -38,13 +38,20 @@ app.get('/data', function(req, resq) {
 	console.log("Sending x and y");
 	resq.writeHead(200);
 
-	var data1= new Object();
-	data1.x = x;
-	data1.y = y;
-	data1.tx = tx;
-	data1.ty = ty;
-	console.log("sending : " + JSON.stringify(data1));
-	resq.write(JSON.stringify(data1));
+	if (idx != 0 ) {
+		var data1= new Object();
+		data1.x = x[idx - 1];
+		data1.y = y[idx - 1];
+		data1.tx = tx;[idx - 1]
+		data1.ty = ty[idx - 1];
+		idx--;
+		console.log("sending : " + JSON.stringify(data1));
+		resq.write(JSON.stringify(data1));
+	} else {
+		resq.write("{'data':'no data'");
+	}
+
 	resq.end();
 });
 
+app.listen((process.env.PORT || 5000));

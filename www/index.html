@@ -62,10 +62,27 @@ function startup() {
   el.addEventListener("touchleave", handleEnd, false);
   el.addEventListener("touchmove", handleMove, false);
   post_data(2,1);
+  setInterval(print_in_other_canvas, 50);
   log("initialized.");
 }
 
 var ongoingTouches = new Array();
+
+function print_in_other_canvas() {
+  log("1111111111111111111111111");
+  $.ajax({
+      type: 'GET',
+      url: '/data',
+      async : 'false',
+      dataType : 'json',
+            cache: false,
+      timeout : 5000,
+      success : success_cb,
+      error: function() {
+        log("ee");
+      }
+   }).done();
+}
 
 function handleStart(evt) {
   evt.preventDefault();
@@ -112,27 +129,41 @@ function post_data(x,y, tx, ty) {
 			},
 		}).done();
 
+
 }
 
 
 var x,y, tx, ty;
 function success_cb(data)
 {
+  try {
+  var data1 = new Object();
 	x = data.x;
 	y = data.y;
   tx = data.tx;
   ty = data.ty;
 	log("Got the x = " + x + " y = " + y + " tx = " + tx + " ty = " + ty);
+  var el1 = document.getElementsByTagName("canvas")[1];
+  var ctx1 = el1.getContext("2d");
+
+  ctx1.beginPath();
+  log("ctx1.moveTo("+x+", "+y+");");
+
+  ctx1.moveTo(x, y);
+  log("ctx1.lineTo("+tx+", "+ty+");");
+  ctx1.lineTo(tx, ty);
+  ctx1.lineWidth = 4;
+  ctx1.strokeStyle = color;
+  ctx1.stroke();
+  } catch (err) {
+
+  }
 }
 
 function handleMove(evt) {
   evt.preventDefault();
   var el = document.getElementsByTagName("canvas")[0];
   var ctx = el.getContext("2d");
-
-  var el1 = document.getElementsByTagName("canvas")[1];
-  var ctx1 = el1.getContext("2d");
-
   var touches = evt.changedTouches;
 
   for (var i=0; i < touches.length; i++) {
@@ -152,33 +183,6 @@ function handleMove(evt) {
       ctx.lineWidth = 4;
       ctx.strokeStyle = color;
       ctx.stroke();
-
-
-      var data1 = new Object();
-
-	$.ajax({
-			type: 'GET',
-			url: '/data',
-			async : 'false',
-			dataType : 'json',
-		        cache: false,
-			timeout : 5000,
-			success : success_cb,
-			error: function() {
-				log("ee");
-			}
-		}).done();	
-
-      ctx1.beginPath();
-      log("ctx1.moveTo("+x+", "+y+");");
-
-      ctx1.moveTo(x, y);
-      log("ctx1.lineTo("+tx+", "+ty+");");
-      ctx1.lineTo(tx, ty);
-      ctx1.lineWidth = 4;
-      ctx1.strokeStyle = color;
-      ctx1.stroke();
-
       ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
       log(".");
     } else {
