@@ -18,7 +18,7 @@ app.get('/hi', function(req, res) {
 	console.log("hi");
 });
 
-var x[10000], y[10000], tx[10000], ty[10000];
+var x = [], y = [], tx = [], ty = [];
 var idx;
 app.post('/data', function(req, resp){
 
