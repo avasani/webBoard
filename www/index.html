@@ -3,14 +3,14 @@
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 <style>
-    canvas { border: 1px solid #ccc }
+    canvas { border: 1px solid #ccc  background:url("images/background.jpg")}
 </style>
 
 <div id="sketch">
-    <canvas id="c" width="500" height="300"></canvas>    
+    <canvas id="c" width="800" height="500"></canvas>
 </div>
 <div id="client_sketch">
-    <canvas id="client" width="500" height="300"></canvas>
+    <canvas id="client" width="800" height="500"></canvas>
 </div>
 
 <script>
@@ -25,17 +25,21 @@ Array.prototype.clear = function() {
 var el = document.getElementById('c');
 var ctx = el.getContext('2d');
 var isDrawing;
-var serverCanvasOffset = $('#c').offset();
+var lineWidthS = 10;
+var lineStrokeStyleS = 'rgba(0, 100, 0, 0.25)';
 
 /* Lets define the data structures for sending data to server */
 var SpointX1, SpointY1;
-var SpointX2 = [], SpointY2 = [];
+var SpointX2 = [], SpointY2 = [];   
 
+/* Touch event handlers, we need to handle more events */
 el.addEventListener("touchstart", doTouchStart, false);
 el.addEventListener("touchend", doTouchEnd, false);
 el.addEventListener("touchmove", doTouchMove, false);
 
 function doTouchStart(evt) {
+    var serverCanvasOffset = el.getBoundingClientRect();
+  
     event.preventDefault();
 
     var canvas_x = event.targetTouches[0].pageX;
@@ -43,8 +47,9 @@ function doTouchStart(evt) {
 
 
     isDrawing = true;
-    ctx.lineWidth = 10;
+    ctx.lineWidth = lineWidthS;
     ctx.lineJoin = ctx.lineCap = 'round';
+    ctx.strokeStyle = lineStrokeStyleS;
     debugMsg("canvas offset" + JSON.stringify(serverCanvasOffset));
     /* This client is the brower*/
     ctx.moveTo(canvas_x - serverCanvasOffset.left, canvas_y - serverCanvasOffset.top);
@@ -55,6 +60,8 @@ function doTouchStart(evt) {
 }
 
 function doTouchEnd(evt) {
+    var serverCanvasOffset = el.getBoundingClientRect();
+  
     event.preventDefault();
     isDrawing = false;
     send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2);
@@ -64,6 +71,8 @@ function doTouchEnd(evt) {
 }
 
 function doTouchMove(evt) {
+    var serverCanvasOffset = el.getBoundingClientRect();
+    ctx.strokeStyle = lineStrokeStyleS;
     event.preventDefault();
 
     var canvas_x = event.targetTouches[0].pageX;
@@ -91,6 +100,8 @@ function doTouchMove(evt) {
 }
 
 el.onmousedown = function(e) {
+  var serverCanvasOffset = el.getBoundingClientRect();
+
   isDrawing = true;
   ctx.lineWidth = 10;
   ctx.lineJoin = ctx.lineCap = 'round';
@@ -103,6 +114,8 @@ el.onmousedown = function(e) {
   debugMsg("mouse Down : {" + SpointX1 + " " + SpointY1 + " }");
 };
 el.onmousemove = function(e) {
+  var serverCanvasOffset = el.getBoundingClientRect();
+
   if (isDrawing) {
     ctx.lineTo(e.clientX - serverCanvasOffset.left, e.clientY - serverCanvasOffset.top);
     ctx.stroke();
@@ -175,7 +188,9 @@ function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
 var el_client = document.getElementById('client');
 var ctx_client = el_client.getContext('2d');
 var clientCanvasOffset = $('#client').offset();
-var color = "blue";
+var lineWidthC = 10;
+var lineStrokeStyleC = 'rgba(0, 100, 0, 0.25)';
+
 /* This function draws on the client canvas. pointX2/Y2 are the array of
   points and X1/Y1 are the start points */
 function client_draw(pointX1, pointY1, pointX2, pointY2) {
@@ -183,8 +198,8 @@ function client_draw(pointX1, pointY1, pointX2, pointY2) {
     var tx, ty;
 
     ctx_client.beginPath();
-    ctx_client.lineWidth = 10;
-    ctx_client.strokeStyle = color;
+    ctx_client.lineWidth = lineWidthC;
+    ctx_client.strokeStyle = lineStrokeStyleC;
     ctx_client.lineJoin = ctx_client.lineCap = 'round';
     ctx_client.moveTo(pointX1, pointY1);
     while(pointX2.length > 0) {
@@ -192,7 +207,7 @@ function client_draw(pointX1, pointY1, pointX2, pointY2) {
         ty = pointY2.pop();
         ctx_client.lineTo(tx, ty);
         ctx_client.stroke();
-        ctx_client.moveTo(tx, ty);
+        //ctx_client.moveTo(tx, ty);
     }
 }
 
@@ -254,7 +269,7 @@ function init() {
 }
 
 function init_server() {
-  /* Nothing to initilize on the server side */
+    console.log("Init Server Done");
 }
 
 var timeout;
@@ -264,6 +279,16 @@ function init_client() {
 
 }
 
-init();
+$(document).ready(function() {
+    var contextS = document.getElementById('c').getContext("2d");
+    var contextC = document.getElementById('client').getContext("2d");
+    var img = new Image();
+    img.onload = function () {
+        contextS.drawImage(img, 0, 0, 800, 500);
+        contextC.drawImage(img, 0, 0, 800, 500);
+    }
+    img.src="/images/background.png";
+    init();
+});
 
 </script>

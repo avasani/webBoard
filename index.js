@@ -4,7 +4,9 @@ var app = express(), bodyParser = require('body-parser');
 app.use(bodyParser());
 var http = require('http');
 var httpServer = http.Server(app);
-	
+
+app.use("/images", express.static(__dirname + '/www/images'));
+
 console.log("dir name: ",__dirname);
 app.use(express.static(__dirname+'/www'));
 
@@ -110,4 +112,4 @@ app.get('/data', function(req, resq) {
 	resq.end();
 });
 
-app.listen((process.env.PORT || 5000));
+app.listen(((process.env.PORT || 5000)));
