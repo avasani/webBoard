@@ -1,263 +1,269 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>getUserMedia Example</title>
-    <meta name="description" content="WebRTC Simple example" />
-    <meta name="author" content="Ido Green | greenido.wordpress.com">
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <meta name="keywords" content="WebRTC, HTML5, JavaScript, Hack, Ido Green" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <base target="_blank">
+<title>WebBoard Test Demo</title>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-    <style>
-      video {
-        height: 25em;
-        position: relative;
-        left: 15%;
-      }
+<style>
+    canvas { border: 1px solid #ccc }
+</style>
 
-      #video-space {
-        padding: 1em;
-        background-color: rgba(70, 70, 6, 0.55);
-        border-radius: 25px;
-      }
-      ul {
-        padding: 2em;
-        font-family: sans-serif;
-        font-size: 120%;
-        line-height:160%;
-        background-color: lightgray;
-        border-radius: 25px
-      }
-    </style>
-  </head>
-
-  <body>
-
-    <h1>getUserMexcdia API Example</h1>
-	<div>
-<canvas id="canvas" width="600" height="600" style="border:solid black 1px;">
-  Your browser does not support canvas element.
-</canvas>
-
-<canvas id="canvas_1" width="600" height="600" style="border:solid black 1px;">
-  Your browser does not support canvas element.
-</canvas>
-
-<br>
-<button onclick="startup()">Initialize</button>
-<br>
-Log: <pre id="log" style="border: 1px solid #ccc;"></pre>
+<div id="sketch">
+    <canvas id="c" width="500" height="300"></canvas>    
+</div>
+<div id="client_sketch">
+    <canvas id="client" width="500" height="300"></canvas>
 </div>
 
-    <script>
-  
-function startup() {
-  var el = document.getElementsByTagName("canvas")[0];
-  el.addEventListener("touchstart", handleStart, false);
-  el.addEventListener("touchend", handleEnd, false);
-  el.addEventListener("touchcancel", handleCancel, false);
-  el.addEventListener("touchleave", handleEnd, false);
-  el.addEventListener("touchmove", handleMove, false);
-  post_data(2,1);
-  setInterval(print_in_other_canvas, 50);
-  log("initialized.");
+<script>
+
+/* Global functions */
+/* Use array.clear */
+Array.prototype.clear = function() {
+    this.splice(0, this.length);
+};
+
+/* This is server side code */
+var el = document.getElementById('c');
+var ctx = el.getContext('2d');
+var isDrawing;
+var serverCanvasOffset = $('#c').offset();
+
+/* Lets define the data structures for sending data to server */
+var SpointX1, SpointY1;
+var SpointX2 = [], SpointY2 = [];
+
+el.addEventListener("touchstart", doTouchStart, false);
+el.addEventListener("touchend", doTouchEnd, false);
+el.addEventListener("touchmove", doTouchMove, false);
+
+function doTouchStart(evt) {
+    event.preventDefault();
+
+    var canvas_x = event.targetTouches[0].pageX;
+    var canvas_y = event.targetTouches[0].pageY;
+
+
+    isDrawing = true;
+    ctx.lineWidth = 10;
+    ctx.lineJoin = ctx.lineCap = 'round';
+    debugMsg("canvas offset" + JSON.stringify(serverCanvasOffset));
+    /* This client is the brower*/
+    ctx.moveTo(canvas_x - serverCanvasOffset.left, canvas_y - serverCanvasOffset.top);
+    /* Add points to postData */
+    SpointX1 = canvas_x - serverCanvasOffset.left;
+    SpointY1 = canvas_y - serverCanvasOffset.top;
+    debugMsg("Touch End: {" + SpointX1 + " " + SpointY1 + " }");
 }
 
-var ongoingTouches = new Array();
+function doTouchEnd(evt) {
+    event.preventDefault();
+    isDrawing = false;
+    send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2);
+    SpointX2.clear();
+    SpointY2.clear();
+    debugMsg("Touch End");
+}
 
-function print_in_other_canvas() {
-  log("1111111111111111111111111");
+function doTouchMove(evt) {
+    event.preventDefault();
+
+    var canvas_x = event.targetTouches[0].pageX;
+    var canvas_y = event.targetTouches[0].pageY;
+    
+    if (isDrawing) {
+      ctx.lineTo(canvas_x - serverCanvasOffset.left, canvas_y - serverCanvasOffset.top);
+      ctx.stroke();
+      /* Add points to postData */
+      if (SpointX2.length > 0) {
+        tempX = SpointX2.pop();
+        tempY = SpointY2.pop();
+        if ((tempX == (canvas_x - serverCanvasOffset.left)) && (tempY == (canvas_y - serverCanvasOffset.top))) {
+            debugMsg("Already Added this point, hence ignore");
+            return;
+        } else {
+          SpointX2.push(tempX);
+          SpointY2.push(tempY);
+        }
+      }
+      SpointX2.push(canvas_x - serverCanvasOffset.left);
+      SpointY2.push(canvas_y - serverCanvasOffset.top);
+      debugMsg("Touch Move : X2= " + SpointX2  + " Y2= " + SpointY2+ "");
+    }
+}
+
+el.onmousedown = function(e) {
+  isDrawing = true;
+  ctx.lineWidth = 10;
+  ctx.lineJoin = ctx.lineCap = 'round';
+  debugMsg("canvas offset" + JSON.stringify(serverCanvasOffset));
+  /* This client is the brower*/
+  ctx.moveTo(e.clientX - serverCanvasOffset.left, e.clientY - serverCanvasOffset.top);
+  /* Add points to postData */
+  SpointX1 = e.clientX - serverCanvasOffset.left;
+  SpointY1 = e.clientY - serverCanvasOffset.top;
+  debugMsg("mouse Down : {" + SpointX1 + " " + SpointY1 + " }");
+};
+el.onmousemove = function(e) {
+  if (isDrawing) {
+    ctx.lineTo(e.clientX - serverCanvasOffset.left, e.clientY - serverCanvasOffset.top);
+    ctx.stroke();
+    /* Add points to postData */
+    if (SpointX2.length > 0) {
+        tempX = SpointX2.pop();
+        tempY = SpointY2.pop();
+        if ((tempX == (e.clientX - serverCanvasOffset.left)) && (tempY == (e.clientY - serverCanvasOffset.top))) {
+            debugMsg("Already Added this point, hence ignore");
+            return;
+        } else {
+          SpointX2.push(tempX);
+          SpointY2.push(tempY);
+        }
+    }
+    SpointX2.push(e.clientX - serverCanvasOffset.left);
+    SpointY2.push(e.clientY - serverCanvasOffset.top);
+    debugMsg("mouse Move : X2= " + SpointX2  + " Y2= " + SpointY2+ "");
+  }
+};
+el.onmouseup = function() {
+  isDrawing = false;
+  send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2);
+  SpointX2.clear();
+  SpointY2.clear();
+  debugMsg("mouse up");
+};
+
+var enable_debug = 1;
+function debugMsg(msg) {
+    console.log("Debug :" + msg);
+}
+/* Code to send the stroke data to server */
+function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
+    var postData = new Object();
+
+    postData.pointX1 = SpointX1;
+    postData.pointY1 = SpointY1;
+    postData.pointX2 = new Array();
+    postData.pointY2 = new Array();
+
+    SpointX2.reverse();
+    SpointY2.reverse();
+    while(SpointX2.length != 0) {
+        postData.pointX2.push(SpointX2.pop())
+        postData.pointY2.push(SpointY2.pop());
+    }
+
+    console.log("Sending: " + JSON.stringify(postData));
+
+    $.ajax({
+        type: 'POST',
+        url: '/serverData',
+        data: JSON.stringify(postData),
+        async : 'true',
+        dataType : 'json',
+        contentType : 'application/json',
+        timeout : 5000,
+        success: function() {
+            console.log("Data sent to the server");
+        },
+        error: function(err) {
+            //console.log("Error in sending data"+JSON.stringify(err));
+        },
+    }).done();
+
+}
+
+/* This is client side code */
+var el_client = document.getElementById('client');
+var ctx_client = el_client.getContext('2d');
+var clientCanvasOffset = $('#client').offset();
+var color = "blue";
+/* This function draws on the client canvas. pointX2/Y2 are the array of
+  points and X1/Y1 are the start points */
+function client_draw(pointX1, pointY1, pointX2, pointY2) {
+
+    var tx, ty;
+
+    ctx_client.beginPath();
+    ctx_client.lineWidth = 10;
+    ctx_client.strokeStyle = color;
+    ctx_client.lineJoin = ctx_client.lineCap = 'round';
+    ctx_client.moveTo(pointX1, pointY1);
+    while(pointX2.length > 0) {
+        tx = pointX2.pop();
+        ty = pointY2.pop();
+        ctx_client.lineTo(tx, ty);
+        ctx_client.stroke();
+        ctx_client.moveTo(tx, ty);
+    }
+}
+
+/* Ajax Success call back for client GET on /data */
+function client_got_data_cb(data) {
+  var pointX1, pointY1;
+  var pointX2 = []; pointY2 = [];
+
+  /* Lets fix the json format of data:
+    {"pointX1":10,"pointY1":20, "pointX2":[10,20,20,30], "pointY2" : [11,20,33,50]}
+    We assume that the lenght og pointX2 and pointY2 is same*/
+ 
+ try {
+    console.log("GET data: " + JSON.stringify(data));
+    pointX1 = data.pointX1;
+    pointY1 = data.pointY1;
+    while(data.pointX2.length != 0) {
+        pointX2.push(data.pointX2.pop());
+        pointY2.push(data.pointY2.pop());
+    }
+    /* We got the complete stroke. Let's draw it */
+    client_draw(pointX1, pointY1, pointX2, pointY2);
+  } catch (err) {
+     /* What is the data is incorrect */
+     console.log(err);
+  }
+  timeout = setTimeout(client_get_server_stroke, 500);
+}
+
+/* Do an ajax call to get the data */
+function client_get_server_stroke() {
+
+  /* Let's not waste memory. Clear the previous timeout*/
+  clearTimeout(timeout);
   $.ajax({
       type: 'GET',
-      url: '/data',
+      url: '/serverData',
       async : 'false',
       dataType : 'json',
             cache: false,
       timeout : 5000,
-      success : success_cb,
+      success : client_got_data_cb,
       error: function() {
-        log("ee");
+        console.log("Error in client get /serverData");
+        timeout = setTimeout(client_get_server_stroke, 500);
       }
-   }).done();
+    }).done();
 }
 
-function handleStart(evt) {
-  evt.preventDefault();
-  log("touchstart.");
-  var el = document.getElementsByTagName("canvas")[0];
-  var ctx = el.getContext("2d");
-  var touches = evt.changedTouches;
-        
-  for (var i=0; i < touches.length; i++) {
-    log("touchstart:"+i+"...");
-    ongoingTouches.push(copyTouch(touches[i]));
-    var color = colorForTouch(touches[i]);
-    ctx.beginPath();
-    ctx.arc(touches[i].pageX, touches[i].pageY, 4, 0,2*Math.PI, false);  // a circle at the start
-    ctx.fillStyle = color;
-    ctx.fill();
-    log("touchstart:"+i+".");
-  }
+/* Common initilizations */
+function init() {
+  console.log("init");
+  /* First we will initilize the server timer. Initially we will send the
+    the periodic data to server with interval = 500miliseconds */
+    init_server();
+    /* Let receive the data twice the frequeny as server. If it don't work
+    then fine tune the frequency */
+    init_client();
 }
 
-function post_data(x,y, tx, ty) {
+function init_server() {
+  /* Nothing to initilize on the server side */
+}
 
-	log("?>>>>>"+x+y);
-	var data1 = new Object();
-	data1.x = x;
-	data1.y = y;
-  data1.tx = tx;
-  data1.ty = ty;
-	log(JSON.stringify(data1));
-
-	$.ajax({
-			type: 'POST',
-			url: '/data',
-			data: JSON.stringify(data1),
-			async : 'true',
-			dataType : 'json',
-			contentType : 'application/json',
-			timeout : 5000,
- 			success: function() {
-				log("sent!!");
-			},
-			error: function(err) {
-				log("------"+JSON.stringify(err));
-			},
-		}).done();
-
+var timeout;
+function init_client() {
+    /* Start client period timer. Logic can be replaced with socket.io or webRTC data channel*/
+    timeout = setTimeout(client_get_server_stroke, 500);
 
 }
 
+init();
 
-var x,y, tx, ty;
-function success_cb(data)
-{
-  try {
-  var data1 = new Object();
-	x = data.x;
-	y = data.y;
-  tx = data.tx;
-  ty = data.ty;
-	log("Got the x = " + x + " y = " + y + " tx = " + tx + " ty = " + ty);
-  var el1 = document.getElementsByTagName("canvas")[1];
-  var ctx1 = el1.getContext("2d");
-
-  ctx1.beginPath();
-  log("ctx1.moveTo("+x+", "+y+");");
-
-  ctx1.moveTo(x, y);
-  log("ctx1.lineTo("+tx+", "+ty+");");
-  ctx1.lineTo(tx, ty);
-  ctx1.lineWidth = 4;
-  ctx1.strokeStyle = color;
-  ctx1.stroke();
-  } catch (err) {
-
-  }
-}
-
-function handleMove(evt) {
-  evt.preventDefault();
-  var el = document.getElementsByTagName("canvas")[0];
-  var ctx = el.getContext("2d");
-  var touches = evt.changedTouches;
-
-  for (var i=0; i < touches.length; i++) {
-    var color = colorForTouch(touches[i]);
-    var idx = ongoingTouchIndexById(touches[i].identifier);
-
-    if(idx >= 0) {
-      log("continuing touch "+idx);
-      ctx.beginPath();
-      log("ctx.moveTo("+ongoingTouches[idx].pageX+", "+ongoingTouches[idx].pageY+");");
-      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-      log("ctx.lineTo("+touches[i].pageX+", "+touches[i].pageY+");");
-
-      post_data(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY, touches[i].pageX, touches[i].pageY);
-
-      ctx.lineTo(touches[i].pageX, touches[i].pageY);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = color;
-      ctx.stroke();
-      ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
-      log(".");
-    } else {
-      log("can't figure out which touch to continue");
-    }
-  }
-}
-
-function handleEnd(evt) {
-  evt.preventDefault();
-  log("touchend/touchleave.");
-  var el = document.getElementsByTagName("canvas")[0];
-  var ctx = el.getContext("2d");
-  var touches = evt.changedTouches;
-
-  for (var i=0; i < touches.length; i++) {
-    var color = colorForTouch(touches[i]);
-    var idx = ongoingTouchIndexById(touches[i].identifier);
-
-    if(idx >= 0) {
-      ctx.lineWidth = 4;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-      ctx.lineTo(touches[i].pageX, touches[i].pageY);
-      ctx.fillRect(touches[i].pageX-4, touches[i].pageY-4, 8, 8);  // and a square at the end
-      ongoingTouches.splice(idx, 1);  // remove it; we're done
-    } else {
-      log("can't figure out which touch to end");
-    }
-  }
-}
-
-function handleCancel(evt) {
-  evt.preventDefault();
-  log("touchcancel.");
-  var touches = evt.changedTouches;
-  
-  for (var i=0; i < touches.length; i++) {
-    ongoingTouches.splice(i, 1);  // remove it; we're done
-  }
-}
-
-function colorForTouch(touch) {
-  var r = touch.identifier % 16;
-  var g = Math.floor(touch.identifier / 3) % 16;
-  var b = Math.floor(touch.identifier / 7) % 16;
-  r = r.toString(16); // make it a hex digit
-  g = g.toString(16); // make it a hex digit
-  b = b.toString(16); // make it a hex digit
-  var color = "#" + r + g + b;
-  log("color for touch with identifier " + touch.identifier + " = " + color);
-  return color;
-}
-
-function copyTouch(touch) {
-  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
-}
-
-function ongoingTouchIndexById(idToFind) {
-  for (var i=0; i < ongoingTouches.length; i++) {
-    var id = ongoingTouches[i].identifier;
-    
-    if (id == idToFind) {
-      return i;
-    }
-  }
-  return -1;    // not found
-}
-
-function log(msg) {
-  var p = document.getElementById('log');
-  p.innerHTML = msg + "\n" + p.innerHTML;
-}
-
-    </script>
-</body>
-</html>
+</script>
