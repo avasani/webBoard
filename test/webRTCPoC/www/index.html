@@ -145,6 +145,7 @@ el.onmouseup = function() {
 };
 
 var enable_debug = 1;
+var imgUrl = "/background.png"
 function debugMsg(msg) {
     console.log("Debug :" + msg);
 }
@@ -152,13 +153,14 @@ function debugMsg(msg) {
 function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
     var postData = new Object();
 
+    postData.imgUrl = slideUrl;
     postData.pointX1 = SpointX1;
     postData.pointY1 = SpointY1;
     postData.pointX2 = new Array();
     postData.pointY2 = new Array();
 
-    SpointX2.reverse();
-    SpointY2.reverse();
+    //SpointX2.reverse();
+    //SpointY2.reverse();
     while(SpointX2.length != 0) {
         postData.pointX2.push(SpointX2.pop())
         postData.pointY2.push(SpointY2.pop());
@@ -174,7 +176,7 @@ function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
         dataType : 'json',
         contentType : 'application/json',
         timeout : 5000,
-        success: function() {
+        success: function(data) {
             console.log("Data sent to the server");
         },
         error: function(err) {
@@ -182,6 +184,52 @@ function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
         },
     }).done();
 
+}
+/* Send image url to server*/
+function addSlideByServer(slideUrl) {
+    var postData = new Object();
+    postData.image = slideUrl;
+
+    $.ajax({
+        type: 'POST',
+        url: '/addSlide',
+        data: JSON.stringify(postData),
+        async : 'flase',
+        dataType : 'json',
+        contentType : 'application/json',
+        timeout : 5000,
+        success: function(data) {
+            console.log("Slide add to the server");
+        },
+        
+    }).done();
+
+}
+
+function startClientPooling(data) {
+    console.log("added the user");
+    setTimeout(client_get_server_stroke, 500);
+}
+
+var tokenId;
+function joinUser(tokenId) {
+    var postData = new Object();
+    console.log("token " + tokenId);
+    postData.id = tokenId;
+
+    $.ajax({
+        type: 'POST',
+        url: '/userJoin',
+        data: JSON.stringify(postData),
+        async : 'flase',
+        dataType : 'json',
+        contentType : 'application/json',
+        timeout : 5000,
+        success: startClientPooling,
+        error: function(err) {
+            console.log("Error in sending data"+JSON.stringify(err));
+        },
+    }).done();
 }
 
 /* This is client side code */
@@ -207,7 +255,6 @@ function client_draw(pointX1, pointY1, pointX2, pointY2) {
         ty = pointY2.pop();
         ctx_client.lineTo(tx, ty);
         ctx_client.stroke();
-        //ctx_client.moveTo(tx, ty);
     }
 }
 
@@ -216,35 +263,38 @@ function client_got_data_cb(data) {
   var pointX1, pointY1;
   var pointX2 = []; pointY2 = [];
 
+  console.log("Client Data : " + JSON.stringify(data));
   /* Lets fix the json format of data:
     {"pointX1":10,"pointY1":20, "pointX2":[10,20,20,30], "pointY2" : [11,20,33,50]}
-    We assume that the lenght og pointX2 and pointY2 is same*/
- 
- try {
-    console.log("GET data: " + JSON.stringify(data));
-    pointX1 = data.pointX1;
-    pointY1 = data.pointY1;
-    while(data.pointX2.length != 0) {
-        pointX2.push(data.pointX2.pop());
-        pointY2.push(data.pointY2.pop());
+    We assume that the lenght of pointX2 and pointY2 is same */
+  try {
+  for (var i = 0; i < data.points.length; i++) {
+        console.log("GET data: " + JSON.stringify(data));
+        pointX1 = data.points[i].X1;
+        pointY1 = data.points[i].Y1;
+        while(data.points[i].X2.length != 0) {
+          pointX2.push(data.points[i].X2.pop());
+          pointY2.push(data.points[i].Y2.pop());
+        }
+        /* We got the complete stroke. Let's draw it */
+        client_draw(pointX1, pointY1, pointX2, pointY2);
     }
-    /* We got the complete stroke. Let's draw it */
-    client_draw(pointX1, pointY1, pointX2, pointY2);
-  } catch (err) {
-     /* What is the data is incorrect */
-     console.log(err);
+  } catch(err) {
+
   }
   timeout = setTimeout(client_get_server_stroke, 500);
 }
 
 /* Do an ajax call to get the data */
 function client_get_server_stroke() {
-
+  var data = new Object();
+  data.id = tokenId;
   /* Let's not waste memory. Clear the previous timeout*/
   clearTimeout(timeout);
   $.ajax({
-      type: 'GET',
-      url: '/serverData',
+      type: 'POST',
+      url: '/serverDataForClient',
+      data: data,
       async : 'false',
       dataType : 'json',
             cache: false,
@@ -253,6 +303,28 @@ function client_get_server_stroke() {
       error: function() {
         console.log("Error in client get /serverData");
         timeout = setTimeout(client_get_server_stroke, 500);
+      }
+    }).done();
+}
+
+function getClientTokenId() {
+
+  $.ajax({
+      type: 'GET',
+      url: '/getClientSessionToken',
+      async : 'false',
+      dataType : 'json',
+            cache: false,
+      timeout : 5000,
+      success : function(data) {
+          console.log("Got New Token" + JSON.stringify(data));
+          tokenId = data.tokenid;
+          console.log("Token id " + tokenId);
+          joinUser(tokenId);
+          return;
+      },
+      error: function() {
+        console.log("Error in client get /serverData");
       }
     }).done();
 }
@@ -266,19 +338,26 @@ function init() {
     /* Let receive the data twice the frequeny as server. If it don't work
     then fine tune the frequency */
     init_client();
+
 }
 
 function init_server() {
+    addSlideByServer(slideUrl);
     console.log("Init Server Done");
 }
 
 var timeout;
-function init_client() {
-    /* Start client period timer. Logic can be replaced with socket.io or webRTC data channel*/
-    timeout = setTimeout(client_get_server_stroke, 500);
-
+function startClient() {
+    debugMsg("Starting Clinet");
+    getClientTokenId();
 }
 
+function init_client() {
+    /* Start client period timer. Logic can be replaced with socket.io or webRTC data channel*/
+    startClient();
+}
+
+var slideUrl = "/images/background.png";
 $(document).ready(function() {
     var contextS = document.getElementById('c').getContext("2d");
     var contextC = document.getElementById('client').getContext("2d");
@@ -287,7 +366,7 @@ $(document).ready(function() {
         contextS.drawImage(img, 0, 0, 800, 500);
         contextC.drawImage(img, 0, 0, 800, 500);
     }
-    img.src="/images/background.png";
+    img.src= slideUrl;
     init();
 });
 
