@@ -1,0 +1,53 @@
+<html>
+
+<head>
+
+    <script src="http://cdn.webrtc-experiment.com/MediaStreamRecorder-v1.2.js" data-require="MediaRecorder" data-scripts-dir="/msr/">
+    </script>
+</head>
+
+<body>
+    <video id="videol" autoplay="autoplay"></video>
+    <button id="button1" onclick="startcall();">startRecord</button>
+    <button id="button2" onclick="stopcall();">stopRecord</button>
+    <script type="text/javascript">
+    var mConstraints = {
+        audio: !!navigator.mozGetUserMedia, // don't forget audio!
+        video: true // don't forget video!
+    };
+    var lvideo = document.getElementById("videol");
+
+    function start(stream) {
+        var url = window.URL || window.webkitURL;
+        lvideo.src = url ? url.createObjectURL(stream) : stream;
+        lvideo.play();
+
+    }
+
+    function startcall() {
+        navigator.getUserMedia(mConstraints, function(stream) {
+            start(stream);
+            var mediaRecorder = new MediaStreamRecorder(stream);
+            mediaRecorder.mimeType = 'video/webm';
+
+            mediaRecorder.ondataavailable = function(blob) {
+                // POST/PUT "Blob" using FormData/XHR2
+                console.log("****************" + blob);
+                var blobURL = URL.createObjectURL(blob);
+
+            };
+            mediaRecorder.start(3000);
+        }, function(e) {
+            console.error('media error', e);
+        });
+    }
+
+    function stopcall() {
+        document.write('<p>&lt;a href="' + blobURL + '"&gt;' + blobURL + '&lt;/a&gt;</p>');
+    }
+    </script>
+
+
+</body>
+
+</html>
