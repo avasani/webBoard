@@ -1,0 +1,13 @@
+WebRTC capture
+
+This module captures the webRTC stream in a blob file and sent it to the server.
+The blob file is sent to the nodejs server and the node server will multiplex 
+to the different clients.
+
+Installation Steps:
+$ npm install body-parser websocket express
+$ nodejs server.js 
+
+Run:
+http://localhost:3000
+
