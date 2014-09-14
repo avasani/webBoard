@@ -12,8 +12,8 @@
     <button id="button2" onclick="stopcall();">stopRecord</button>
     <script type="text/javascript">
     var mConstraints = {
-        audio: !!navigator.mozGetUserMedia, // don't forget audio!
-        video: true // don't forget video!
+        audio: !!navigator.mozGetUserMedia, 
+        video: true 
     };
     var lvideo = document.getElementById("videol");
 
@@ -31,7 +31,6 @@
             mediaRecorder.mimeType = 'video/webm';
 
             mediaRecorder.ondataavailable = function(blob) {
-                // POST/PUT "Blob" using FormData/XHR2
                 console.log("****************" + blob);
                 var blobURL = URL.createObjectURL(blob);
 
