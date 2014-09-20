@@ -45,11 +45,11 @@ function upload(response, request) {
         console.log("parsing done");
         /* possible error on windows systems :
  tried to rename to an already existing file */
-        fs.rename(files.upload.path, "c:\\tmp\\test.pdf", function(err) {
+        fs.rename(files.upload.path, "/tmp/test.pdf", function(err) {
             if (err) {
-                fs.unlink("c:\\tmp\\test.pdf");
+                fs.unlink("/tmp/test.pdf");
                 console.log("Value of files.upload.path : " + files.upload.path);
-                fs.rename(files.upload.path, "c:\\tmp\\test.pdf");
+                fs.rename(files.upload.path, "/tmp/test.pdf");
             }
         });
         response.writeHead(200, {

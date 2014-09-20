@@ -37,6 +37,9 @@ npm install pdfkit
 npm install poppler-glib  
 sudo apt-get install libpoppler-glib-dev
 npm install pdfutils
+npm install express
+npm install body-parser
+
 nodejs index.js
 
 
@@ -47,5 +50,4 @@ Instructor page with video and ppt display, upload form for the instructor to up
 pdf are converted into images at backend and are displayed as images in the canavs on the browser, 
 Student page for displaying ppt as well as the video of the professor.
 
-This design is in progress.  
-
+This design is in progress.
