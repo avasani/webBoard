@@ -18,5 +18,34 @@ server uses single buffer right now, hence only one user can see the actual stok
 The design will be changes the to support multiple users and multiple images with live and
 recorded storage.
 
-Good Day!!
+
+WebBoard:
+This module is the base module of the final application.
+It includes bootstrap for css, uses GhostScript and spindrift module
+for converting pdf to images,uses formidable for uploading the pdf to the server,
+uses jquery for dynamic changing of grids.
+
+To run this appplication on the local machine, do the following.
+npm install 
+sudo apt-get install npm 
+sudo apt-get install nodejs-dev 
+sudo apt-get install npm  
+npm install connect  
+npm install formidable 
+npm install spindrift 
+npm install pdfkit 
+npm install poppler-glib  
+sudo apt-get install libpoppler-glib-dev
+npm install pdfutils
+nodejs index.js
+
+
+Open the application with the path as 127.0.0.1:3000
+
+This demo displays the structure of the application with login and register form,
+Instructor page with video and ppt display, upload form for the instructor to upload the pdf,
+pdf are converted into images at backend and are displayed as images in the canavs on the browser, 
+Student page for displaying ppt as well as the video of the professor.
+
+This design is in progress.  
 
