@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weboard</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <script type="text/javascript" src="js/respond.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row" style="margin-top:20px">
+            <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-6">
+                <canvas id="pptCanvas" class="pptcanvas" height="200px" style="border:1px solid #000000;">
+                </canvas>
+                <button id="pptbtn">Click to zoom</button>
+            </div>
+            <div id="videodiv" class="col-xs-12 col-sm-8 col-md-6">
+                <canvas id="videoCanvas" class="videocanvas" height="200px" style="border:1px solid #000000;">
+                </canvas>
+                <button id="videobtn">Click to zoom</button>
+            </div>
+        </div>
+
+    </div>
+    <!-- javascript -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    var pptOn, videoOn;
+
+    $('#pptbtn').click(function() {
+        if ($('#pptdiv').hasClass('col-md-6')) {
+            $('#pptdiv').removeClass('col-md-6');
+            $('#pptdiv').addClass('col-md-9');
+            $('#videodiv').removeClass('col-md-6');
+            $('#videodiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom Out');
+        } else if ($('#pptdiv').hasClass('col-md-9')) {
+            $('#pptdiv').removeClass('col-md-9');
+            $('#pptdiv').addClass('col-md-6');
+            $('#videodiv').removeClass('col-md-3');
+            $('#videodiv').addClass('col-md-6');
+            $('#pptbtn').text('Click to Zoom');
+        }else if ($('#pptdiv').hasClass('col-md-3')) {
+            $('#pptdiv').removeClass('col-md-3');
+            $('#pptdiv').addClass('col-md-9');
+            $('#videodiv').removeClass('col-md-9');
+            $('#videodiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom Out');
+            $('#videobtn').text('Click to Zoom');
+        }
+    });
+    $('#videobtn').click(function() {
+        if ($('#videodiv').hasClass('col-md-6')) {
+            $('#videodiv').removeClass('col-md-6');
+            $('#videodiv').addClass('col-md-9');
+            $('#pptdiv').removeClass('col-md-6');
+            $('#pptdiv').addClass('col-md-3');
+            $('#videobtn').text('Click to Zoom Out');
+        } else if ($('#videodiv').hasClass('col-md-9')) {
+            $('#videodiv').removeClass('col-md-9');
+            $('#videodiv').addClass('col-md-6');
+            $('#pptdiv').removeClass('col-md-3');
+            $('#pptdiv').addClass('col-md-6');
+            $('#videobtn').text('Click to Zoom');
+        } else if ($('#videodiv').hasClass('col-md-3')) {
+            $('#videodiv').removeClass('col-md-3');
+            $('#videodiv').addClass('col-md-9');
+            $('#pptdiv').removeClass('col-md-9');
+            $('#pptdiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom');
+            $('#videobtn').text('Click to Zoom Out');
+        }
+
+    });
+    </script>
+
+</body>
+
+</html>
