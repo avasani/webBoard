@@ -30,4 +30,26 @@ app.get('/show', function(req, res){
     requestHandlers.show(req, res);
 });
 
+var sessionURL = null;
+app.post('/sessionURL', function(req, res){
+		sessionURL=req.body.sessionURL;
+        console.log("Saving :" + sessionURL);
+		res.writeHead(200);
+		res.write("{'success':0}");
+		res.end();
+});
+
+app.get('/studentLogin', function(req, res) {
+        res.sendfile(__dirname + '/student-webboard.html');
+});
+
+app.get('/student', function(req, res){
+    //res.sendfile(__dirname + '/www/index.html');
+    var getData = new Object();
+    getData.sessionURL = sessionURL;
+    res.writeHead(200);
+	res.write(JSON.stringify(getData));
+	res.end();
+});
+
 app.listen(3000);
