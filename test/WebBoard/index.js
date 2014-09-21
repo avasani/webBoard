@@ -1,14 +1,16 @@
 var express = require('express');
 var app = express(), bodyParser = require('body-parser');
-app.use(bodyParser());
 var http = require('http');
 var requestHandlers = require("./requestHandler");
 var webBoard = require("./nodeWebBoard");
 var httpServer = http.Server(app);
 
+
 app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
+app.use("/images", express.static(__dirname + '/images'));
 app.use("/fonts", express.static(__dirname + '/fonts'));
+ app.use(bodyParser.urlencoded({extended:true,uploadDir:'./uploads'}));
 
 /* Send the index file for "/" */ 
 app.get('/', function(req, res){
@@ -21,8 +23,10 @@ app.get('/start', function(req, res){
     requestHandlers.start(res);
 });
 
+
 app.post('/upload', function(req, res){
     //res.sendfile(__dirname + '/www/index.html');
+    console.log("POST");
     requestHandlers.upload(req, res);
 });
 
@@ -51,6 +55,11 @@ app.get('/student', function(req, res){
     res.writeHead(200);
 	res.write(JSON.stringify(getData));
 	res.end();
+
+app.get('/dirPath', function(req, res){
+    //res.sendfile(__dirname + '/www/index.html');
+    console.log("dirPath");
+    requestHandlers.dirPath(req, res);
 });
 
 /* WebBoard Calls */

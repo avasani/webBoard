@@ -6,6 +6,9 @@ var spindrift = require('spindrift');
 var instructorhtml;
 var PDFDocument = require('pdfkit');
 var pdfutils = require('pdfutils').pdfutils;
+var mkpath = require('mkpath');
+var path = require('path');
+var easyimg = require('easyimage');
 
 fs.readFile('./instructor-webboard.html', function(err, html) {
     if (err) {
@@ -14,22 +17,8 @@ fs.readFile('./instructor-webboard.html', function(err, html) {
     instructorhtml = html;
 });
 
-
-
 function start(response) {
     console.log("Request handler start was called.");
-    var body = "<html>" +
-        "<head>" +
-        "<meta http-equiv='Content-Type' content='text/html'; " +
-        "charset='UTF-8' />" +
-        "</head>" +
-        "<body>" +
-        "<form action='/upload' enctype='multipart/form-data' method='post'>" +
-        "<input type='file' name='upload'></input>" +
-        "<input type='submit' value='Upload file' />" +
-        "</form>" +
-        "</body>" +
-        "</html>";
     response.writeHead(200, {
         "Content-Type": "text/html"
     });
@@ -37,94 +26,131 @@ function start(response) {
     response.end();
 }
 
-function upload(response, request) {
+/* TODO: Needs to maintain the path per user */
+var globalDirPath = null;
+
+//'use strict';
+function getFiles(dir, files_) {
+    files_ = files_ || [];
+    if (typeof files_ === 'undefined') files_ = [];
+    var files = fs.readdirSync(dir);
+    for (var i in files) {
+        if (!files.hasOwnProperty(i)) continue;
+        var name = dir + '/' + files[i];
+        if (fs.statSync(name).isDirectory()) {
+            getFiles(name, files_);
+        } else {
+            files_.push(name);
+        }
+    }
+    return files_;
+}
+
+function getDirectory(dir, files_) {
+    files_ = files_ || [];
+    if (typeof files_ === 'undefined') files_ = [];
+    var files = fs.readdirSync(dir);
+    for (var i in files) {
+        if (!files.hasOwnProperty(i)) continue;
+        var name = dir + '/' + files[i];
+        if (fs.statSync(name).isDirectory()) {
+            files_.push(name);
+        }
+    }
+    return files_;
+}
+
+function dirPath(req, res) {
+    var sendData = new Object();
+    //sendData.path = getDirectory("./images");
+    sendData.path = globalDirPath;
+    sendData.count = counter;
+    console.log(">>>>>>>>>>>Sending " + sendData.path);
+    res.writeHead(200);
+    res.write(JSON.stringify(sendData));
+    res.end();
+}
+
+function upload(req, res) {
+    var target_path;
     console.log("Request handler upload was called.");
     var form = new formidable.IncomingForm();
     console.log("about to parse");
-    form.parse(request, function(error, fields, files) {
+    form.parse(req, function(error, fields, files) {
         console.log("parsing done");
-        /* possible error on windows systems :
- tried to rename to an already existing file */
-        fs.rename(files.upload.path, "/tmp/test.pdf", function(err) {
-            if (err) {
-                fs.unlink("/tmp/test.pdf");
-                console.log("Value of files.upload.path : " + files.upload.path);
-                fs.rename(files.upload.path, "/tmp/test.pdf");
-            }
+        var tmp_path = files.upload.path;
+        console.log(tmp_path);
+        // set where the file should actually exists - in this case it is in the "images" directory
+        target_path = './images/' + files.upload.name;
+        // move the file from the temporary location to the intended location
+        fs.rename(tmp_path, target_path, function(err) {
+            if (err) throw err;
+            // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
+            fs.unlink(tmp_path, function() {
+                if (err) {
+                    console.log(">>>>>>>>>>>>>>>>>>>>>>errr");
+                    return;
+                }
+                show(req, res, target_path);
+                var dir = path.basename(target_path, '.pdf');
+                globalDirPath = dir;
+                var messageSend = 'File uploaded to: ' + target_path + ' - ' + files.upload.size + ' bytes';
+            });
         });
-        response.writeHead(200, {
-            "Content-Type": "text/html"
-        });
-        response.write("Received pdf: <br/>");
-        //response.write("<a href="/show">"/show"</a>");
-        response.end();
     });
 }
 
-function show(res, req) {
-    console.log("Request handler show was called.");
-    // var pdf = spindrift('c:\\tmp\\test.pdf');
-    // pdf.pngStream(300).pipe(fs.createWriteStream('out-page1.png'));
-    // fs.readFile("c:\\tmp\\test.pdf","binary", function(error,file)
-    // {
-    // if (error)
-    // {
-    // response.writeHead(500, {"Content-Type": "text/plain" });
-    // response.write(error + "\n");
-    // response.end();
-    // }
-    // else
-    // {
-    // response.writeHead(200, {"Content-Type" : "application/png" });
-    // response.write(file, "binary" );
-    // response.end();
-    // }
-    // });
-    // var doc = new PDFDocument('ok.pdf');
-
-    // var range = doc.bufferedPageRange();
-
-    // console.log(range.start+" ***  "+range.count);
-
-    pdfutils("ok.pdf",function(err,doc){
-//doc[0].asPNG({MaxWidth:500, MaxHeight: 500}).toFile("out.png");
-
-
-for(var i=1;i<doc.length;i++){
-    exec("/usr/bin/gs -dQUIET -dPARANOIDSAFER -dBATCH -dNOPAUSE -dNOPROMPT -sDEVICE=jpeg -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r72 -dFirstPage="+i+" -dLastPage="+i+" -sOutputFile=out"+i+".png ok.pdf", function(error, stdout, stderr) {
+function convert(target_path, dir, ii) {
+    console.log(ii);
+    exec("/usr/bin/gs -dQUIET -dPARANOIDSAFER -dBATCH -dNOPAUSE -dNOPROMPT -sDEVICE=jpeg -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r72 -dFirstPage=" + ii + " -dLastPage=" + ii + " -sOutputFile=./images/" + dir + "/out" + ii + ".jpeg " + target_path, function(error, stdout, stderr) {
         console.log("Request handler show was called.");
         if (error !== null) {
             console.log("Request handler show was called.");
             console.log(error);
         } else {
-            var img = fs.readFileSync('out'+i+'.png');
-            res.writeHead(200, {
-                'Content-Type': 'image/png'
+            var src = './images/' + dir + '/out' + ii + '.jpeg ';
+            console.log(src);
+            easyimg.resize({
+                src: src,
+                dst: src,
+                width: 600,
+                height: 600
+            }, function(err, stdout, stderr) {
+                if (err) throw err;
+                console.log('Resized to 640x480');
             });
-            res.end(img, 'binary');
-            console.log('Created PNG: out'+i+'.png');
+
+            console.log('Created PNG ./images/' + dir + '/out' + ii + '.jpeg');
         }
     });
+
+    console.log("exit");
+    counter++;
 }
-});
 
-    // exec("/usr/bin/gs -dQUIET -dPARANOIDSAFER -dBATCH -dNOPAUSE -dNOPROMPT -sDEVICE=jpeg -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r72 -dFirstPage=1 -dLastPage=1 -sOutputFile=out.png ok.pdf", function(error, stdout, stderr) {
-    //     console.log("Request handler show was called.");
-    //     if (error !== null) {
-    //         console.log("Request handler show was called.");
-    //         console.log(error);
-    //     } else {
-    //         var img = fs.readFileSync('out.png');
-    //         res.writeHead(200, {
-    //             'Content-Type': 'image/png'
-    //         });
-    //         res.end(img, 'binary');
-    //         console.log('Created PNG: out.png');
-    //     }
-    // });
-    
+var counter = 0;
 
+
+function show(req, res, target_path) {
+    console.log("Request handler show was called.");
+    console.log(target_path);
+    var dir = path.basename(target_path, '.pdf');
+    mkpath('./images/' + dir, function(err) {
+        if (err) throw err;
+        console.log('Directory structure ' + './images/' + dir + ' created');
+    });
+
+    pdfutils(target_path, function(err, doc) {
+        console.log("%%%" + doc.length);
+        for (var i = 1; i <= doc.length; i++) {
+            console.log(i + " ####### " + doc.length);
+            convert(target_path, dir, i);
+
+        }
+
+    });
 }
 exports.start = start;
 exports.upload = upload;
 exports.show = show;
+exports.dirPath = dirPath;

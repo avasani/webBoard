@@ -22,7 +22,7 @@
                                         <div id="uploaddiv" class="col-xs-12 col-sm-12 col-md-12">
                                             <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
                                                 <!-- <input type="file" id="userPhotoInput" name="displayImage" /> -->
-                                                <input type="file" id="pdfupload" name="upload" />
+                                                <input type="file" id="upload" name="upload" />
                                                 <input type="submit" value="Upload">
                                             </form>
                                         </div>
@@ -97,5 +97,112 @@
                                });
 
 
-                           </script>>
+                           </script>
+    <script type="text/javascript">
+    var pathOfImages;
+    var counter;
+    var check = true;
+
+    function waitForPath() {
+        $.ajax({
+            type: 'GET',
+            url: 'dirPath',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(data) {
+                if (data.path == null && data.path == "") {
+                    console.log("Path not found!!");
+                    //setInterval(waitForPath, 1000);
+                } else {
+                    console.log(">>>>>>>>>Got Path " + data.path);
+                    check = false;
+                    pathOfImages = data.path;
+                    counter = data.count;
+                    displayInCanavs();
+                }
+            },
+            error: function(err) {
+                console.log("Err" + err);
+            }
+        }).done();
+    }
+
+    var path;
+    $('#formSubmit').on('click', function() {
+        var fd = new FormData();
+        fd.append("upload", document.getElementById('uploadPDF').files[0]);
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener("load", uploadComplete, false);
+        xhr.open("POST", "/upload");
+
+        xhr.send(fd);
+
+    });
+    var timeout;
+
+    function dummy() {
+        timeout = setTimeout(function() {
+            clearTimeout(timeout);
+            waitForPath();
+            if (check)
+                dummy();
+        }, 3000);
+    }
+    window.onload = function() {
+        dummy();
+    };
+
+    function uploadComplete(evt) {
+        /* This event is raised when the server send back a response */
+        console.log("Reached in complete");
+        alert(evt.target.responseText);
+    }
+    var myCanvas = document.getElementById('instcanvas');
+    var instDiv = document.getElementById('instpptdiv');
+    var contextS = document.getElementById('instcanvas').getContext("2d");
+    var img = new Image();
+    var current = 0;
+    var slideUrl = new Array;
+
+    function displayInCanavs() {
+        console.log(counter);
+
+        for (var i = 0; i < counter; i++) {
+            slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
+            console.log(slideUrl[i]);
+        }
+        img.src = slideUrl[0];
+    }
+
+    $(document).ready(function() {
+
+        img.onload = function() {
+            console.log("width" + img.width + "height" + img.height);
+            contextS.drawImage(img, 0, 0, 800, 500);
+        }
+
+
+        $('#next').click(function() {
+            console.log("next" + current);
+            if (current == counter - 1) {
+                current = counter - 1;
+            } else {
+                current++;
+            }
+            img.src = slideUrl[current];
+        });
+        $('#previous').click(function() {
+            console.log("previous" + current);
+            if (current == 0) {
+                current = 0;
+            } else {
+                current--;
+            }
+
+            img.src = slideUrl[current];
+        });
+    });
+    </script>
+
                            </html>
+
