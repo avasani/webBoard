@@ -1,208 +1,208 @@
-                            <!doctype html>
-                            <html>
+<!doctype html>
+<html>
 
-                            <head>
-                                <meta charset="utf-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Weboard</title>
-                                <link href="css/bootstrap.min.css" rel="stylesheet">
-                                <link href="css/custom.css" rel="stylesheet">
-                                <script type="text/javascript" src="js/respond.min.js"></script>
-                                <script type="text/javascript" src="js/common.js"></script>
-                                <script src="https://www.webrtc-experiment.com/firebase.js"></script>
-                                <script type="text/javascript" src="js/meeting.js"> </script>
-                                <script type="text/javascript" src="js/webboard.js"> </script>
-
-                            </head>
-
-                            <body>
-
-                                <div class="container">
-                                    <div class="row" style="margin-top:20px">
-                                        <div id="uploaddiv" class="col-xs-12 col-sm-12 col-md-12">
-                                            <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
-                                                <!-- <input type="file" id="userPhotoInput" name="displayImage" /> -->
-                                                <input type="file" id="upload" name="upload" />
-                                                <input type="submit" value="Upload">
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="row" style="margin-top:20px">
-                                        <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-8">
-                                        <canvas id="serverCanvas" width="600" height="500" style="border:1px solid #000000;"></canvas>
-                                        </div>
-                                        <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-4">
-                                            <button width="50px" id="setup-new-live-class">Setup New Live Session</button>
-                                            <section style="border-left: 1px solid black; width: 100px; height: 100px;" id="videos-container">
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <!-- javascript -->
-                                    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-                                    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-
-
-                                </body>
-                                <script type="text/javascript">
-                                    var hash = window.location.hash.replace('#', '');
-                                    var meeting = new Meeting(hash);
-
-                                    var videoContainer = document.getElementById('videos-container');
-
-                            // on getting media stream
-                            meeting.onaddstream = function(e) {
-                                e.video.width = 200;
-                                e.video.height = 200;
-                                videoContainer.appendChild(e.video);
-                            };
-
-                            // using firebase for signaling
-                            meeting.firebase = 'rtcweb';
-
-                            // if someone leaves; just remove his video
-                            meeting.onuserleft = function(userid) {
-                                var video = document.getElementById(userid);
-                                if (video) video.parentNode.removeChild(video);
-                            };
-
-                            var is_started = false;
-                            function successCb(data) {
-                                console.log(JSON.stringify(data));
-                                is_started = true;
-                            }
-
-                            function errorCb(err) {
-                                console.log(err);
-                            }
-                            document.getElementById('setup-new-live-class').onclick = function() {
-                                    // setup new meeting room
-                                    if (is_started) {
-                                        console.log("Stopping now");
-                                        $("#setup-new-live-class" ).text("Start Again");
-                                        /* TODO: Stop code */
-                                        return;
-                                    }
-                                    meeting.setup('Class-ASU');
-                                    this.disabled = true;
-                                    var postData = new Object();
-                                    postData.sessionURL = location.href;
-                                    //ajaxPOST("sessionURL", JSON.stringify(postData), successCb, errorCb);
-
-                                    $("#setup-new-live-class" ).text("Stop Session");
-                                };
-
-                                $(document).ready(function() {
-                                   init_server('serverCanvas');
-                               });
-
-
-                           </script>
-    <script type="text/javascript">
-    var pathOfImages;
-    var counter;
-    var check = true;
-
-    function waitForPath() {
-        $.ajax({
-            type: 'GET',
-            url: 'dirPath',
-            dataType: 'json',
-            contentType: 'application/json',
-            success: function(data) {
-                if (data.path == null && data.path == "") {
-                    console.log("Path not found!!");
-                    //setInterval(waitForPath, 1000);
-                } else {
-                    console.log(">>>>>>>>>Got Path " + data.path);
-                    check = false;
-                    pathOfImages = data.path;
-                    counter = data.count;
-                    displayInCanavs();
-                }
-            },
-            error: function(err) {
-                console.log("Err" + err);
-            }
-        }).done();
-    }
-
-    var path;
-    $('#formSubmit').on('click', function() {
-        var fd = new FormData();
-        fd.append("upload", document.getElementById('uploadPDF').files[0]);
-        var xhr = new XMLHttpRequest();
-        xhr.addEventListener("load", uploadComplete, false);
-        xhr.open("POST", "/upload");
-
-        xhr.send(fd);
-
-    });
-    var timeout;
-
-    function dummy() {
-        timeout = setTimeout(function() {
-            clearTimeout(timeout);
-            waitForPath();
-            if (check)
-                dummy();
-        }, 3000);
-    }
-    window.onload = function() {
-        dummy();
-    };
-
-    function uploadComplete(evt) {
-        /* This event is raised when the server send back a response */
-        console.log("Reached in complete");
-        alert(evt.target.responseText);
-    }
-    var myCanvas = document.getElementById('instcanvas');
-    var instDiv = document.getElementById('instpptdiv');
-    var contextS = document.getElementById('instcanvas').getContext("2d");
-    var img = new Image();
-    var current = 0;
-    var slideUrl = new Array;
-
-    function displayInCanavs() {
-        console.log(counter);
-
-        for (var i = 0; i < counter; i++) {
-            slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
-            console.log(slideUrl[i]);
-        }
-        img.src = slideUrl[0];
-    }
-
-    $(document).ready(function() {
-
-        img.onload = function() {
-            console.log("width" + img.width + "height" + img.height);
-            contextS.drawImage(img, 0, 0, 800, 500);
-        }
-
-
-        $('#next').click(function() {
-            console.log("next" + current);
-            if (current == counter - 1) {
-                current = counter - 1;
-            } else {
-                current++;
-            }
-            img.src = slideUrl[current];
-        });
-        $('#previous').click(function() {
-            console.log("previous" + current);
-            if (current == 0) {
-                current = 0;
-            } else {
-                current--;
-            }
-
-            img.src = slideUrl[current];
-        });
-    });
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weboard</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <script type="text/javascript" src="js/respond.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script src="https://www.webrtc-experiment.com/firebase.js"></script>
+    <script type="text/javascript" src="js/meeting.js">
+    </script>
+    <script type="text/javascript" src="js/webboard.js">
     </script>
 
-                           </html>
+</head>
 
+<body>
+
+    <div class="container">
+        <div class="row" style="margin-top:20px">
+            <div id="uploaddiv" class="col-xs-12 col-sm-12 col-md-12">
+                <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
+                    <!-- <input type="file" id="userPhotoInput" name="displayImage" /> -->
+                    <input type="file" id="upload" name="upload" />
+                    <input type="submit" value="Upload">
+                </form>
+            </div>
+        </div>
+        <div class="row" style="margin-top:20px">
+            <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-8">
+                <canvas id="serverCanvas" width="600" height="500" style="border:1px solid #000000;"></canvas>
+            </div>
+            <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-4">
+                <button width="50px" id="setup-new-live-class">Setup New Live Session</button>
+                <section style="border-left: 1px solid black; width: 100px; height: 100px;" id="videos-container">
+            </div>
+        </div>
+
+    </div>
+    <!-- javascript -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+
+</body>
+<script type="text/javascript">
+var hash = window.location.hash.replace('#', '');
+var meeting = new Meeting(hash);
+
+var videoContainer = document.getElementById('videos-container');
+
+// on getting media stream
+meeting.onaddstream = function(e) {
+    e.video.width = 200;
+    e.video.height = 200;
+    videoContainer.appendChild(e.video);
+};
+
+// using firebase for signaling
+meeting.firebase = 'rtcweb';
+
+// if someone leaves; just remove his video
+meeting.onuserleft = function(userid) {
+    var video = document.getElementById(userid);
+    if (video) video.parentNode.removeChild(video);
+};
+
+var is_started = false;
+
+function successCb(data) {
+    console.log(JSON.stringify(data));
+    is_started = true;
+}
+
+function errorCb(err) {
+    console.log(err);
+}
+document.getElementById('setup-new-live-class').onclick = function() {
+    // setup new meeting room
+    if (is_started) {
+        console.log("Stopping now");
+        $("#setup-new-live-class").text("Start Again");
+        /* TODO: Stop code */
+        return;
+    }
+    meeting.setup('Class-ASU');
+    this.disabled = true;
+    var postData = new Object();
+    postData.sessionURL = location.href;
+    //ajaxPOST("sessionURL", JSON.stringify(postData), successCb, errorCb);
+
+    $("#setup-new-live-class").text("Stop Session");
+};
+
+$(document).ready(function() {
+    init_server('serverCanvas');
+});
+</script>
+<script type="text/javascript">
+var pathOfImages;
+var counter;
+var check = true;
+
+function waitForPath() {
+    $.ajax({
+        type: 'GET',
+        url: 'dirPath',
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data) {
+            if (data.path == null && data.path == "") {
+                console.log("Path not found!!");
+                //setInterval(waitForPath, 1000);
+            } else {
+                console.log(">>>>>>>>>Got Path " + data.path);
+                check = false;
+                pathOfImages = data.path;
+                counter = data.count;
+                displayInCanavs();
+            }
+        },
+        error: function(err) {
+            console.log("Err" + err);
+        }
+    }).done();
+}
+
+var path;
+$('#formSubmit').on('click', function() {
+    var fd = new FormData();
+    fd.append("upload", document.getElementById('upload').files[0]);
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", uploadComplete, false);
+    xhr.open("POST", "/upload");
+
+    xhr.send(fd);
+
+});
+var timeout;
+
+function dummy() {
+    timeout = setTimeout(function() {
+        clearTimeout(timeout);
+        waitForPath();
+        if (check)
+            dummy();
+    }, 3000);
+}
+window.onload = function() {
+    dummy();
+};
+
+function uploadComplete(evt) {
+    /* This event is raised when the server send back a response */
+    console.log("Reached in complete");
+    alert(evt.target.responseText);
+}
+var myCanvas = document.getElementById('instcanvas');
+var instDiv = document.getElementById('instpptdiv');
+var contextS = document.getElementById('instcanvas').getContext("2d");
+var img = new Image();
+var current = 0;
+var slideUrl = new Array;
+
+function displayInCanavs() {
+    console.log(counter);
+
+    for (var i = 0; i < counter; i++) {
+        slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
+        console.log(slideUrl[i]);
+    }
+    img.src = slideUrl[0];
+}
+
+$(document).ready(function() {
+
+    img.onload = function() {
+        console.log("width" + img.width + "height" + img.height);
+        contextS.drawImage(img, 0, 0, 800, 500);
+    }
+
+
+    $('#next').click(function() {
+        console.log("next" + current);
+        if (current == counter - 1) {
+            current = counter - 1;
+        } else {
+            current++;
+        }
+        img.src = slideUrl[current];
+    });
+    $('#previous').click(function() {
+        console.log("previous" + current);
+        if (current == 0) {
+            current = 0;
+        } else {
+            current--;
+        }
+
+        img.src = slideUrl[current];
+    });
+});
+</script>
+
+</html>

@@ -9,6 +9,11 @@ var pdfutils = require('pdfutils').pdfutils;
 var mkpath = require('mkpath');
 var path = require('path');
 var easyimg = require('easyimage');
+var util = require('util');
+var multiparty = require('multiparty');
+var fs1 = require('fs-extra');
+var format = require('util').format;
+
 
 fs.readFile('./instructor-webboard.html', function(err, html) {
     if (err) {
@@ -75,13 +80,18 @@ function upload(req, res) {
     var target_path;
     console.log("Request handler upload was called.");
     var form = new formidable.IncomingForm();
-    console.log("about to parse");
+    form.uploadDir = __dirname+'/images/';
+
     form.parse(req, function(error, fields, files) {
+
+        var upload = "upload";
         console.log("parsing done");
+        console.log("file size: " + JSON.stringify(files));
         var tmp_path = files.upload.path;
-        console.log(tmp_path);
+        console.log("/temp path"+tmp_path);
+
         // set where the file should actually exists - in this case it is in the "images" directory
-        target_path = './images/' + files.upload.name;
+        target_path = __dirname+'/images/' + files.upload.name;
         // move the file from the temporary location to the intended location
         fs.rename(tmp_path, target_path, function(err) {
             if (err) throw err;
@@ -141,7 +151,7 @@ function show(req, res, target_path) {
     });
 
     pdfutils(target_path, function(err, doc) {
-        console.log("%%%" + doc.length);
+        console.log("%" + doc.length);
         for (var i = 1; i <= doc.length; i++) {
             console.log(i + " ####### " + doc.length);
             convert(target_path, dir, i);
