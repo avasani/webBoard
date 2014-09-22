@@ -28,7 +28,7 @@ function addSlide(request, response) {
 			image_meta_data.img = request.body.image;
 			image_meta_data.strokes = new Array();
 			sessions[0].session.PPT_Data.push(image_meta_data);
-			console.log("Added new image " + JSON.stringify(sessions[0].session.PPT_Data));
+			console.log("Added new image ");
 		} else {
 			console.log("Image is already added");
 		}
@@ -82,12 +82,11 @@ function endSession(request, response) {
 exports.serverData = serverData;
 function serverData(request, response) {
 
-	console.log("POST DATA on /serverData" + JSON.stringify(request.body));
-
 	var serverDataLength = sessions[0].session.PPT_Data.length;
 
 
 	if (serverDataLength < 0) {
+		console.log("Error /serverData " + JSON.stringify(serverDataLength));
 		/* This image is incorrect, hence ignore it*/
 		response.writeHead(200);
 		response.write('{"error":-1}');

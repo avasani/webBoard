@@ -10,10 +10,8 @@
     <script type="text/javascript" src="js/respond.min.js"></script>
     <script type="text/javascript" src="js/common.js"></script>
     <script src="https://www.webrtc-experiment.com/firebase.js"></script>
-    <script type="text/javascript" src="js/meeting.js">
-    </script>
-    <script type="text/javascript" src="js/webboard.js">
-    </script>
+    <script type="text/javascript" src="js/meeting.js"></script>
+    <script type="text/javascript" src="js/webboard.js"></script>
 
 </head>
 
@@ -31,7 +29,11 @@
         </div>
         <div class="row" style="margin-top:20px">
             <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-8">
-                <canvas id="serverCanvas" width="600" height="500" style="border:1px solid #000000;"></canvas>
+                <canvas id="serverCanvas" width="800" height="500" style="border:1px solid #000000;"></canvas>
+                <br/>
+                <button id="previous" > Previous</button>
+                <button id="next" > Next</button>
+
             </div>
             <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-4">
                 <button width="50px" id="setup-new-live-class">Setup New Live Session</button>
@@ -95,9 +97,6 @@ document.getElementById('setup-new-live-class').onclick = function() {
     $("#setup-new-live-class").text("Stop Session");
 };
 
-$(document).ready(function() {
-    init_server('serverCanvas');
-});
 </script>
 <script type="text/javascript">
 var pathOfImages;
@@ -158,9 +157,9 @@ function uploadComplete(evt) {
     console.log("Reached in complete");
     alert(evt.target.responseText);
 }
-var myCanvas = document.getElementById('instcanvas');
+var myCanvas = document.getElementById('serverCanvas');
 var instDiv = document.getElementById('instpptdiv');
-var contextS = document.getElementById('instcanvas').getContext("2d");
+var contextSrv = document.getElementById('serverCanvas').getContext("2d");
 var img = new Image();
 var current = 0;
 var slideUrl = new Array;
@@ -179,7 +178,11 @@ $(document).ready(function() {
 
     img.onload = function() {
         console.log("width" + img.width + "height" + img.height);
-        contextS.drawImage(img, 0, 0, 800, 500);
+        document.getElementById('serverCanvas').width = 0;
+        contextSrv.clearRect(0, 0, 800, 500);
+        document.getElementById('serverCanvas').width = 800;
+
+        contextSrv.drawImage(img, 0, 0, 800, 500);
     }
 
 
@@ -190,7 +193,10 @@ $(document).ready(function() {
         } else {
             current++;
         }
+        contextSrv.clearRect(0, 0, 800, 500);
+        img.src = null;
         img.src = slideUrl[current];
+        addSlideByServer(slideUrl[current]);
     });
     $('#previous').click(function() {
         console.log("previous" + current);
@@ -199,9 +205,11 @@ $(document).ready(function() {
         } else {
             current--;
         }
-
         img.src = slideUrl[current];
+        addSlideByServer(slideUrl[current]);
     });
+
+        init_server('serverCanvas');
 });
 </script>
 

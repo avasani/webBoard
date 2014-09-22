@@ -1,4 +1,3 @@
-
 function ajaxPOST(url, postData, successCb, errorCb) {
     $.ajax({
         type: 'POST',

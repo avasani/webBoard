@@ -129,20 +129,20 @@ function debugMsg(msg) {
     console.log("Debug :" + msg);
 }
 /* Code to send the stroke data to server */
-function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
+function send_data_to_server(SpointX1_t, SpointY1_t, SpointX2_t, SpointY2_t) {
     var postData = new Object();
 
-    postData.imgUrl = slideUrl;
-    postData.pointX1 = SpointX1;
-    postData.pointY1 = SpointY1;
+    postData.imgUrl = ClientImgUrl;
+    postData.pointX1 = SpointX1_t;
+    postData.pointY1 = SpointY1_t;
     postData.pointX2 = new Array();
     postData.pointY2 = new Array();
 
     //SpointX2.reverse();
     //SpointY2.reverse();
     while(SpointX2.length != 0) {
-        postData.pointX2.push(SpointX2.pop())
-        postData.pointY2.push(SpointY2.pop());
+        postData.pointX2.push(SpointX2_t.pop())
+        postData.pointY2.push(SpointY2_t.pop());
     }
 
     console.log("Sending: " + JSON.stringify(postData));
@@ -165,9 +165,10 @@ function send_data_to_server(SpointX1, SpointY1, SpointX2, SpointY2) {
 
 }
 /* Send image url to server*/
-function addSlideByServer(slideUrl) {
+function addSlideByServer(ClientSlideUrl) {
     var postData = new Object();
-    postData.image = slideUrl;
+    postData.image = ClientSlideUrl;
+    ClientImgUrl = ClientSlideUrl;
 
     $.ajax({
         type: 'POST',
@@ -301,18 +302,22 @@ function getClientTokenId() {
     }).done();
 }
 
+function endSession(clientId) {
+
+}
+
 /* Common initilizations */
 function init() {
   console.log("init");
   /* First we will initilize the server timer. Initially we will send the
     the periodic data to server with interval = 500miliseconds */
-    init_server();
+    init_server("");
     /* Let receive the data twice the frequeny as server. If it don't work
     then fine tune the frequency */
     init_client();  
 
 }
-slideUrl = "./images/1.png";
+var ClientImgUrl = "";
 
 /* This is server side code */
 var el;
@@ -331,7 +336,7 @@ function init_server(serverCanvasId) {
     el.addEventListener("mouseup", onmouseup, false);
     el.addEventListener("mousedown", onmousedown, false);
     
-    addSlideByServer(slideUrl);
+    //addSlideByServer(ClientSlideUrl);
     console.log("Init Server Done");
 }
 
@@ -355,7 +360,7 @@ function init_client(clientCanvasId) {
     startClient();
 }
 
-/*var slideUrl = "/images/background.png";
+/*var ClientSlideUrl = "/images/background.png";
 $(document).ready(function() {
     var contextS = document.getElementById('c').getContext("2d");
     var contextC = document.getElementById('client').getContext("2d");
@@ -364,7 +369,7 @@ $(document).ready(function() {
         contextS.drawImage(img, 0, 0, 800, 500);
         contextC.drawImage(img, 0, 0, 800, 500);
     }
-    img.src= slideUrl;
+    img.src= ClientSlideUrl;
     init();
 });
 
