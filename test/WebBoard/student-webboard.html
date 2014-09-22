@@ -1,135 +1,175 @@
-    <!doctype html>
-    <html>
+<!doctype html>
+<html>
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Weboard</title>
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/custom.css" rel="stylesheet">
-        <script type="text/javascript" src="js/respond.min.js"></script>
-        <script type="text/javascript" src="js/common.js"></script>
-        <script src="https://www.webrtc-experiment.com/firebase.js"></script>
-        <script type="text/javascript" src="js/meeting.js"> </script>
-        <script type="text/javascript" src="js/webboard.js"> </script>
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weboard</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <script type="text/javascript" src="js/respond.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script src="https://www.webrtc-experiment.com/firebase.js"></script>
+    <script type="text/javascript" src="js/meeting.js">
+    </script>
+    <script type="text/javascript" src="js/webboard.js">
+    </script>
+</head>
 
-    <body>
+<body>
 
-        <div class="container">
-            <div class="row" style="margin-top:20px">
-                <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-6">
-                    <canvas id="pptCanvas" width="600" height="500" style="border:1px solid #000000;">
-                    </canvas>
-                    <button id="pptbtn">Click to zoom</button>
-                </div>
-                <div id="videodiv" class="col-xs-12 col-sm-8 col-md-6">
-                    <section class="videocanvas" style="border:1px solid #000000;height:370px ;  " id="videos-container">
-                    </section>
-                    <button id="videobtn">Click to zoom</button>
-                </div>
+    <div class="container">
+        <div class="row" style="margin-top:20px">
+            <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-9">
+                <canvas id="pptCanvas" width="800" height="500" style="border:1px solid #000000;">
+                </canvas>
+               <!--  <button id="pptbtn">Click to zoom</button> -->
             </div>
-
+            <div id="videodiv" class="col-xs-12 col-sm-8 col-md-3">
+                <section class="videocanvas" style="border:1px solid #000000; width:100%; height:260px" id="videos-container">
+                </section>
+                <!-- <button id="videobtn">Click to zoom</button> -->
+            </div>
         </div>
-        <!-- javascript -->
-        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
-        <script type="text/javascript">
-        var pptOn, videoOn;
 
-        $('#pptbtn').click(function() {
-            if ($('#pptdiv').hasClass('col-md-6')) {
-                $('#pptdiv').removeClass('col-md-6');
-                $('#pptdiv').addClass('col-md-9');
-                $('#videodiv').removeClass('col-md-6');
-                $('#videodiv').addClass('col-md-3');
-                $('#pptbtn').text('Click to Zoom Out');
-                $('#videos-container').css({'width':'100%','height':'100px'});
-                $('#videos-container video').css({'width':'100%','height':'100%'});
-            } else if ($('#pptdiv').hasClass('col-md-9')) {
-                $('#pptdiv').removeClass('col-md-9');
-                $('#pptdiv').addClass('col-md-6');
-                $('#videodiv').removeClass('col-md-3');
-                $('#videodiv').addClass('col-md-6');
-                $('#pptbtn').text('Click to Zoom');
-                $('#videos-container').css({'width':'100%','height':'370px'});
-                $('#videos-container video').css({'width':'100%','height':'100%'});
-            }else if ($('#pptdiv').hasClass('col-md-3')) {
-                $('#pptdiv').removeClass('col-md-3');
-                $('#pptdiv').addClass('col-md-9');
-                $('#videodiv').removeClass('col-md-9');
-                $('#videodiv').addClass('col-md-3');
-                $('#pptbtn').text('Click to Zoom Out');
-                $('#videobtn').text('Click to Zoom');
-                $('#videos-container').css({'width':'100%','height':'100px'});
-                $('#videos-container video').css({'width':'100%','height':'100%'});
-            }
-        });
-        $('#videobtn').click(function() {
-            if ($('#videodiv').hasClass('col-md-6')) {
-                $('#videodiv').removeClass('col-md-6');
-                $('#videodiv').addClass('col-md-9');
-                $('#pptdiv').removeClass('col-md-6');
-                $('#pptdiv').addClass('col-md-3');
-                $('#videobtn').text('Click to Zoom Out');
-                $('#videos-container').css({'width':'100%','height':'700px'}); 
-                $('#videos-container video').css({'width':'100%','height':'100%'}); 
-            } else if ($('#videodiv').hasClass('col-md-9')) {
-                $('#videodiv').removeClass('col-md-9');
-                $('#videodiv').addClass('col-md-6');
-                $('#pptdiv').removeClass('col-md-3');
-                $('#pptdiv').addClass('col-md-6');
-                $('#videobtn').text('Click to Zoom');
-                $('#videos-container').css({'width':'100%','height':'370px'});
-                $('#videos-container video').css({'width':'100%','height':'100%'});
-            } else if ($('#videodiv').hasClass('col-md-3')) {
-                $('#videodiv').removeClass('col-md-3');
-                $('#videodiv').addClass('col-md-9');
-                $('#pptdiv').removeClass('col-md-9');
-                $('#pptdiv').addClass('col-md-3');
-                $('#pptbtn').text('Click to Zoom');
-                $('#videobtn').text('Click to Zoom Out');
-                 $('#videos-container').css({'width':'100%','height':'700px'});
-                $('#videos-container video').css({'width':'100%','height':'100%'});
+    </div>
+    <!-- javascript -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    var pptOn, videoOn;
 
-            }
-        });
+    $('#pptbtn').click(function() {
+        if ($('#pptdiv').hasClass('col-md-6')) {
+            $('#pptdiv').removeClass('col-md-6');
+            $('#pptdiv').addClass('col-md-9');
+            $('#videodiv').removeClass('col-md-6');
+            $('#videodiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom Out');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '100px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
+        } else if ($('#pptdiv').hasClass('col-md-9')) {
+            $('#pptdiv').removeClass('col-md-9');
+            $('#pptdiv').addClass('col-md-6');
+            $('#videodiv').removeClass('col-md-3');
+            $('#videodiv').addClass('col-md-6');
+            $('#pptbtn').text('Click to Zoom');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '500px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
+        } else if ($('#pptdiv').hasClass('col-md-3')) {
+            $('#pptdiv').removeClass('col-md-3');
+            $('#pptdiv').addClass('col-md-9');
+            $('#videodiv').removeClass('col-md-9');
+            $('#videodiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom Out');
+            $('#videobtn').text('Click to Zoom');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '100px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
+        }
+    });
+    $('#videobtn').click(function() {
+        if ($('#videodiv').hasClass('col-md-3')) {
+            $('#videodiv').removeClass('col-md-3');
+            $('#videodiv').addClass('col-md-9');
+            $('#pptdiv').removeClass('col-md-9');
+            $('#pptdiv').addClass('col-md-3');
+            $('#pptdiv canvas').attr({'width':'100%','height':'100%'});
+            $('#videobtn').text('Click to Zoom Out');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '500px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
+        } else if ($('#videodiv').hasClass('col-md-9')) {
+            $('#videodiv').removeClass('col-md-9');
+            $('#videodiv').addClass('col-md-6');
+            $('#pptdiv').removeClass('col-md-3');
+            $('#pptdiv').addClass('col-md-6');
+            $('#videobtn').text('Click to Zoom');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '500px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
+        } else if ($('#videodiv').hasClass('col-md-3')) {
+            $('#videodiv').removeClass('col-md-3');
+            $('#videodiv').addClass('col-md-9');
+            $('#pptdiv').removeClass('col-md-9');
+            $('#pptdiv').addClass('col-md-3');
+            $('#pptbtn').text('Click to Zoom');
+            $('#videobtn').text('Click to Zoom Out');
+            $('#videos-container').css({
+                'width': '100%',
+                'height': '800px'
+            });
+            $('#videos-container video').css({
+                'width': '100%',
+                'height': '100%'
+            });
 
-                var hash = window.location.hash.replace('#', '');
-                var meeting = new Meeting(hash);
+        }
+    });
 
-                var videoContainer = document.getElementById('videos-container');
+    var hash = window.location.hash.replace('#', '');
+    var meeting = new Meeting(hash);
+
+    var videoContainer = document.getElementById('videos-container');
 
 
 
-                // on getting media stream
-                meeting.onaddstream = function(e) {
-                        console.log("Adding stream" + e.video.id);
-                        e.video.width = $('#videos-container').width();
-                        e.video.height = $('#videos-container').height();
-                        if (e.video.id != 'self') {
-                            init_client('pptCanvas');
-                            videoContainer.appendChild(e.video);
-                        }
-                };
+    // on getting media stream
+    meeting.onaddstream = function(e) {
+        console.log("Adding stream" + e.video.id);
+        e.video.width = $('#videos-container').width();
+        e.video.height = $('#videos-container').height();
+        if (e.video.id != 'self') {
+            init_client('pptCanvas');
+            videoContainer.appendChild(e.video);
+            $('#videos-container video').attr('controls',false);
+        }
+    };
 
-                // using firebase for signaling
-                meeting.firebase = 'rtcweb';
+    // using firebase for signaling
+    meeting.firebase = 'rtcweb';
 
-                // if someone leaves; just remove his video
-                meeting.onuserleft = function(userid) {
-                        /* TODO: If user leaves the video then we should check again */
-                       var video = document.getElementById(userid);
-                            if (video) video.parentNode.removeChild(video);
-                };
+    // if someone leaves; just remove his video
+    meeting.onuserleft = function(userid) {
+        /* TODO: If user leaves the video then we should check again */
+        var video = document.getElementById(userid);
+        if (video) video.parentNode.removeChild(video);
+    };
 
-                meeting.check();    
+    meeting.check();
 
-                $(document).ready(function() {
-                        
-                });
-        </script>
+    $(document).ready(function() {
 
-    </body>
+    });
+    </script>
 
-    </html>
+</body>
+
+</html>

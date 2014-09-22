@@ -12,6 +12,11 @@
     <script src="https://www.webrtc-experiment.com/firebase.js"></script>
     <script type="text/javascript" src="js/meeting.js"></script>
     <script type="text/javascript" src="js/webboard.js"></script>
+    <style type="text/css">
+    video{
+        padding:10px;
+    }
+    </style>
 
 </head>
 
@@ -28,17 +33,21 @@
             </div>
         </div>
         <div class="row" style="margin-top:20px">
-            <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-8">
+            <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-9">
                 <canvas id="serverCanvas" width="800" height="500" style="border:1px solid #000000;"></canvas>
                 <br/>
-                <button id="previous" > Previous</button>
-                <button id="next" > Next</button>
-
+                <div style="width:800px">
+                    <button id="previous">Previous</button>
+                    <button id="next" style="float:right;">Next</button>
+                </div>
             </div>
-            <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-4">
-                <button width="50px" id="setup-new-live-class">Setup New Live Session</button>
-                <section style="border-left: 1px solid black; width: 100px; height: 100px;" id="videos-container">
+            <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-3">
+                <button id="setup-new-live-class">Setup New Live Session</button>
+                <section id="videos-container">
             </div>
+        </div>
+        <div class="row" style="margin-top:20px">
+            <section id="videos-child-container"></section>
         </div>
 
     </div>
@@ -53,12 +62,22 @@ var hash = window.location.hash.replace('#', '');
 var meeting = new Meeting(hash);
 
 var videoContainer = document.getElementById('videos-container');
+var videoChildContainer = document.getElementById('videos-child-container');
 
 // on getting media stream
 meeting.onaddstream = function(e) {
     e.video.width = 200;
     e.video.height = 200;
-    videoContainer.appendChild(e.video);
+    if(e.video.id=="self"){
+        videoContainer.appendChild(e.video);
+    }else{
+        e.video.float="left";
+        e.video.control
+        videoChildContainer.appendChild(e.video);
+        $('#videos-child-container video').css("padding","10");
+        $('#videos-child-container video').attr('controls',false);
+    }
+    
 };
 
 // using firebase for signaling
@@ -96,7 +115,6 @@ document.getElementById('setup-new-live-class').onclick = function() {
 
     $("#setup-new-live-class").text("Stop Session");
 };
-
 </script>
 <script type="text/javascript">
 var pathOfImages;
