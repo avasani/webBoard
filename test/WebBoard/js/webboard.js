@@ -241,6 +241,7 @@ function client_got_data_cb(data) {
     {"pointX1":10,"pointY1":20, "pointX2":[10,20,20,30], "pointY2" : [11,20,33,50]}
     We assume that the lenght of pointX2 and pointY2 is same */
   try {
+  img.src = data.img;
   for (var i = 0; i < data.points.length; i++) {
         console.log("GET data: " + JSON.stringify(data));
         pointX1 = data.points[i].X1;
@@ -352,11 +353,20 @@ var ctx_client;
 var clientCanvasOffset;
 var lineWidthC = 10;
 var lineStrokeStyleC = 'rgba(0, 100, 0, 0.25)';
+var img = new Image();
 function init_client(clientCanvasId) {
     el_client = document.getElementById(clientCanvasId);
     ctx_client = el_client.getContext('2d');
     clientCanvasOffset = $(clientCanvasId).offset();
     console.log("Client offset " + clientCanvasOffset);
+    img.onload = function() {
+        console.log("width" + img.width + "height" + img.height);
+        document.getElementById(clientCanvasId).width = 0;
+        ctx_client.clearRect(0, 0, 800, 500);
+        document.getElementById(clientCanvasId).width = 800;
+        ctx_client.drawImage(img, 0, 0, 800, 500);
+    }
+
     startClient();
 }
 

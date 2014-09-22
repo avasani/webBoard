@@ -102,6 +102,7 @@ document.getElementById('setup-new-live-class').onclick = function() {
 var pathOfImages;
 var counter;
 var check = true;
+var server_started = false;
 
 function waitForPath() {
     $.ajax({
@@ -119,6 +120,10 @@ function waitForPath() {
                 pathOfImages = data.path;
                 counter = data.count;
                 displayInCanavs();
+                if (!server_started) {
+                    init_server('serverCanvas');
+                    server_started = true;
+                }
             }
         },
         error: function(err) {
@@ -172,6 +177,7 @@ function displayInCanavs() {
         console.log(slideUrl[i]);
     }
     img.src = slideUrl[0];
+    addSlideByServer(slideUrl[current]);
 }
 
 $(document).ready(function() {
@@ -181,7 +187,6 @@ $(document).ready(function() {
         document.getElementById('serverCanvas').width = 0;
         contextSrv.clearRect(0, 0, 800, 500);
         document.getElementById('serverCanvas').width = 800;
-
         contextSrv.drawImage(img, 0, 0, 800, 500);
     }
 
@@ -208,8 +213,6 @@ $(document).ready(function() {
         img.src = slideUrl[current];
         addSlideByServer(slideUrl[current]);
     });
-
-        init_server('serverCanvas');
 });
 </script>
 

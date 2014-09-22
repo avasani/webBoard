@@ -219,9 +219,9 @@ function serverDataForClient(request, response) {
 	var stroke = sessions[0].session.PPT_Data[serverDataLength].strokes[strokesLength];
 
 	var markers = new Object();
+	markers.img = imgUrl;
 	markers.points = new Array();
 	if (ClientSessionData[idx].current_idx <= 0 && strokes.length != 0) {
-			
 			for (var i = 0; i < strokes.length; i++) {
 				var sendData = new Object();
 				sendData.X1 = strokes[i].X1;
@@ -245,7 +245,8 @@ function serverDataForClient(request, response) {
 	if (strokes.length == 0) {
 		/* Let's send error message if data is not available*/
 		console.log("No data to send. Send 404 then :P");
-		response.writeHead(404);
+		response.writeHead(200);
+		response.write(JSON.stringify(markers));
 		response.end();
 		return;		
 	}
@@ -253,7 +254,8 @@ function serverDataForClient(request, response) {
 	if (ClientSessionData[idx].current_idx == sessions[0].session.PPT_Data[serverDataLength].strokes.length) {
 		/* Let's send error message if data is not available*/
 		console.log("No data to send. Send 404 then :P");
-		response.writeHead(404);
+		response.writeHead(200);
+		response.write(JSON.stringify(markers));
 		response.end();
 		return;		
 	}
