@@ -11,6 +11,7 @@
         <script type="text/javascript" src="js/common.js"></script>
         <script src="https://www.webrtc-experiment.com/firebase.js"></script>
         <script type="text/javascript" src="js/meeting.js"> </script>
+        <script type="text/javascript" src="js/webboard.js"> </script>
     </head>
 
     <body>
@@ -18,7 +19,7 @@
         <div class="container">
             <div class="row" style="margin-top:20px">
                 <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-6">
-                    <canvas id="pptCanvas" class="pptcanvas" height="200px" style="border:1px solid #000000;">
+                    <canvas id="pptCanvas" width="600" height="500" style="border:1px solid #000000;">
                     </canvas>
                     <button id="pptbtn">Click to zoom</button>
                 </div>
@@ -106,8 +107,10 @@
                         console.log("Adding stream" + e.video.id);
                         e.video.width = $('#videos-container').width();
                         e.video.height = $('#videos-container').height();
-                        if (e.video.id != 'self')
+                        if (e.video.id != 'self') {
+                            init_client('pptCanvas');
                             videoContainer.appendChild(e.video);
+                        }
                 };
 
                 // using firebase for signaling
@@ -120,8 +123,11 @@
                             if (video) video.parentNode.removeChild(video);
                 };
 
-                meeting.check();
+                meeting.check();    
 
+                $(document).ready(function() {
+                        
+                });
         </script>
 
     </body>

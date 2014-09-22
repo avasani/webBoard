@@ -3,6 +3,7 @@ var app = express(), bodyParser = require('body-parser');
 app.use(bodyParser());
 var http = require('http');
 var requestHandlers = require("./requestHandler");
+var webBoard = require("./nodeWebBoard");
 var httpServer = http.Server(app);
 
 app.use("/css", express.static(__dirname + '/css'));
@@ -50,6 +51,35 @@ app.get('/student', function(req, res){
     res.writeHead(200);
 	res.write(JSON.stringify(getData));
 	res.end();
+});
+
+/* WebBoard Calls */
+app.post('/addSlide', function(request, response) {
+    webBoard.addSlide(request, response);
+});
+
+app.post('/startSession', function(request, response) {
+    webBoard.startSession(request, response);
+});
+
+app.post('/endSession', function(request, response) {
+    webBoard.endSession(request, response);
+});
+
+app.post('/serverData', function(request, response) {
+    webBoard.serverData(request, response);
+});
+
+app.post('/userJoin', function(request, response) {
+    webBoard.userJoin(request, response);
+});
+
+app.get('/getClientSessionToken', function(request, response) {
+    webBoard.getClientSessionToken(request, response);
+});
+
+app.post('/serverDataForClient', function(request, response) {
+        webBoard.serverDataForClient(request, response);
 });
 
 app.listen(3000);
