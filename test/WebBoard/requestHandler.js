@@ -13,6 +13,9 @@ var util = require('util');
 var multiparty = require('multiparty');
 var fs1 = require('fs-extra');
 var format = require('util').format;
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
 
 
 fs.readFile('./instructor-webboard.html', function(err, html) {
