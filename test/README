@@ -23,7 +23,19 @@ WebBoard:
 This module is the base module of the final application.
 It includes bootstrap for css, uses GhostScript and spindrift module
 for converting pdf to images,uses formidable for uploading the pdf to the server,
-uses jquery for dynamic changing of grids.
+uses jquery for dynamic changing of grids and uses passport module 
+for authentication of user during login and redirects to either the 
+student or instructor page.
+
+Test username and password are:-
+
+For Instructor:
+username - bob@example.com
+password - secret
+
+For Student
+username - joe@example.com
+password - birthday
 
 To run this appplication on the local machine, do the following.
 npm install 
@@ -34,6 +46,8 @@ npm install connect
 npm install formidable 
 npm install spindrift 
 npm install pdfkit 
+npm install passport
+npm install passport-local
 npm install poppler-glib  
 sudo apt-get install libpoppler-glib-dev
 npm install pdfutils
