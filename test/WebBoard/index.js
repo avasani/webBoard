@@ -8,6 +8,10 @@ var webBoard = require("./nodeWebBoard");
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var httpServer = http.Server(app);
+var MongoClient = require('mongodb').MongoClient;
+var format = require('util').format;
+var passwordHash = require('password-hash');
+//var passwordHash = require('./lib/password-hash');
 
 app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
@@ -27,24 +31,12 @@ app.get('/start', function(req, res) {
     requestHandlers.start(res);
 });
 
-//<ravin>
+//Sagar
 
-var users = [{
-    id: 1,
-    username: 'bob@example.com',
-    password: 'secret',
-    email: 'bob@example.com',
-    role: 'instructor'
-}, {
-    id: 2,
-    username: 'joe@example.com',
-    password: 'birthday',
-    email: 'joe@example.com',
-    role: 'student'
-}];
+
 
 passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    done(null, user._id);
 });
 passport.deserializeUser(function(id, done) {
     findById(id, function(err, user) {
@@ -52,18 +44,43 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
+app.post('/register.html', function(request, response){
+    MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
+    if(err) throw err;
+
+    var collection = db.collection('credentials');
+    var hashedPassword=passwordHash.generate(request.body.password);
+    collection.insert({fname:request.body.first_name, lname:request.body.last_name, 
+        role:request.body.role_name, username:request.body.email, password:hashedPassword}, function(err, docs) {
+        collection.count(function(err, count) {
+            console.log(format("count = %s", count));       
+            db.close();     
+            });
+        });
+    });
+    response.sendfile(__dirname + '/index.html');
+});
+
+
+MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
+    if(err) throw err;
+
+    var collection = db.collection('credentials');
+    collection.find().toArray(function(err, results) {
+        //console.dir(results);        
+
 function findById(id, fn) {
-    var idx = id - 1;
-    if (users[idx]) {
-        fn(null, users[idx]);
+    var idx = id;
+    if (results[idx]) {
+        fn(null, results[idx]);
     } else {
         fn(new Error('User ' + id + ' does not exist'));
     }
 }
 
 function findByUsername(username, fn) {
-    for (var i = 0, len = users.length; i < len; i++) {
-        var user = users[i];
+    for (var i = 0, len = results.length; i < len; i++) {
+        var user = results[i];
         if (user.username === username) {
             return fn(null, user);
         }
@@ -88,7 +105,10 @@ passport.use(new LocalStrategy(
                         message: 'Unknown user ' + username
                     });
                 }
-                if (user.password != password) {
+
+                //if (user.password != password) 
+                if(!passwordHash.verify(password,user.password))
+                {
                     return done(null, false, {
                         message: 'Invalid password'
                     });
@@ -105,7 +125,7 @@ app.post('/login', function(req, res, next) {
             return next(err)
         }
         if (!user) {
-            req.flash('error', info.message);
+            console.log('error', info.message);
             return res.redirect('/')
         }
         req.logIn(user, function(err) {
@@ -143,6 +163,16 @@ app.post('/sessionURL', function(req, res) {
 app.get('/studentLogin', function(req, res) {
     res.sendfile(__dirname + '/student-webboard.html');
 });
+
+//Sagar
+app.get('/register.html', function(req, res) {
+    res.sendfile(__dirname + '/register.html');
+});
+
+//app.use(express.bodyParser());
+//Sagar
+
+//Sagar
 
 app.get('/student', function(req, res) {
     //res.sendfile(__dirname + '/www/index.html');
@@ -189,5 +219,7 @@ app.post('/serverDataForClient', function(request, response) {
     webBoard.serverDataForClient(request, response);
 });
 
-
+db.close();
+     });
+    });
 app.listen(3000);

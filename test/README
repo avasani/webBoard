@@ -27,15 +27,7 @@ uses jquery for dynamic changing of grids and uses passport module
 for authentication of user during login and redirects to either the 
 student or instructor page.
 
-Test username and password are:-
-
-For Instructor:
-username - bob@example.com
-password - secret
-
-For Student
-username - joe@example.com
-password - birthday
+First you need to register yourself using the 'Register' button on the login form. Once you are done, you can login using your credentials.
 
 To run this appplication on the local machine, do the following.
 npm install 
@@ -52,7 +44,14 @@ npm install poppler-glib
 sudo apt-get install libpoppler-glib-dev
 npm install pdfutils
 nodejs index.js
-
+npm install mongodb
+npm install password-hash
+npm install util
+npm install mkpath
+apt-get install imagemagick
+npm install easyimage
+npm install multiparty
+npm install --save fs-extra
 
 Open the application with the path as 127.0.0.1:3000
 
