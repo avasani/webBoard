@@ -11,7 +11,7 @@ var httpServer = http.Server(app);
 var MongoClient = require('mongodb').MongoClient;
 var format = require('util').format;
 var passwordHash = require('password-hash');
-//var passwordHash = require('./lib/password-hash');
+
 
 app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
@@ -31,7 +31,6 @@ app.get('/start', function(req, res) {
     requestHandlers.start(res);
 });
 
-//Sagar
 
 
 
@@ -164,15 +163,15 @@ app.get('/studentLogin', function(req, res) {
     res.sendfile(__dirname + '/student-webboard.html');
 });
 
-//Sagar
+
 app.get('/register.html', function(req, res) {
     res.sendfile(__dirname + '/register.html');
 });
 
 //app.use(express.bodyParser());
-//Sagar
 
-//Sagar
+
+
 
 app.get('/student', function(req, res) {
     //res.sendfile(__dirname + '/www/index.html');
