@@ -94,7 +94,8 @@ function upload(req, res) {
         console.log("/temp path"+tmp_path);
 
         // set where the file should actually exists - in this case it is in the "images" directory
-        target_path = __dirname+'/images/' + files.upload.name;
+        var filePath = files.upload.name.replace(/[^a-zA-Z.]/g,"");
+        target_path = __dirname+'/images/' + filePath;
         // move the file from the temporary location to the intended location
         fs.rename(tmp_path, target_path, function(err) {
             if (err) throw err;

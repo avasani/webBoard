@@ -23,6 +23,8 @@
 <body>
 
     <div class="container">
+        <div id="getUsername" class="row" style="margin-top:5px">
+        </div>
         <div class="row" style="margin-top:20px">
             <div id="uploaddiv" class="col-xs-12 col-sm-12 col-md-12">
                 <form class="form-inline" id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
@@ -33,9 +35,8 @@
                     <div class="form-group">
                         <input class="btn btn-default" type="submit" value="Upload">
                     </div>
-
-
                 </form>
+
             </div>
         </div>
         <div class="row" style="margin-top:20px">
@@ -77,11 +78,13 @@ meeting.onaddstream = function(e) {
     if (e.video.id == "self") {
         videoContainer.appendChild(e.video);
         $('#videos-container video').attr('controls', false);
-        $('#videos-container video').css({"border-color": "#bdc3c7", 
-             "border-width":"1px", 
-             "border-style":"solid",
-             "width":"260px",
-             "height":"204px"   });
+        $('#videos-container video').css({
+            "border-color": "#bdc3c7",
+            "border-width": "1px",
+            "border-style": "solid",
+            "width": "260px",
+            "height": "204px"
+        });
     } else {
         e.video.float = "left";
         e.video.control
@@ -185,7 +188,36 @@ function dummy() {
 }
 window.onload = function() {
     dummy();
+    //window.location.assign("/");
+    getUser();
 };
+
+function getUser() {
+    ajaxGET('/getUsername', function(data) {
+            $('#getUsername').css({
+                "float": "right"
+            });
+            $('#getUsername').text("Hello " + data.user.fname + " " + data.user.lname + "  ");
+            var r = $('<input type="button" class="btn btn-default" id="logout" value="Logout"/>');
+            $('#getUsername').append(r);
+            $('#logout').on('click', function() {
+                console.log("Hello logout");
+                ajaxGET('/logout', function(data) {
+                    if (data.success === 0) {
+                        console.log("Got Response");
+                        window.location = "/";
+                    }
+                }, function(err) {
+                    console.log("jdvnfjvnevjnvj.");
+                    window.location = "/";
+                });
+            });
+
+        }),
+        function(err) {
+            console.log("Error in retreiving Data.");
+        }
+}
 
 function uploadComplete(evt) {
     /* This event is raised when the server send back a response */
