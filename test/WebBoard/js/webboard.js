@@ -232,11 +232,31 @@ function client_draw(pointX1, pointY1, pointX2, pointY2) {
 }
 
 /* Ajax Success call back for client GET on /data */
+var isVNCLoaded = false;
 function client_got_data_cb(data) {
   var pointX1, pointY1;
   var pointX2 = []; pointY2 = [];
 
   console.log("Client Data : " + JSON.stringify(data));
+
+  try {
+    if (data.vncToken != "") {
+        if (isVNCLoaded != true) {
+            console.log("  " + clientCanvas + "  " + clientiframe + "   " + " tok " + data.vncToken);
+            $("#" + clientCanvas).hide();
+            $("#" + clientiframe).show();
+            document.getElementById(clientiframe).src = data.vncToken;
+            isVNCLoaded = true;
+        }
+        timeout = setTimeout(client_get_server_stroke, 500);
+        return;
+    }
+  } catch(err) {
+
+  }
+  isVNCLoaded = false;
+  $("#" + clientCanvas).show();
+  $("#" + clientiframe).hide();
   /* Lets fix the json format of data:
     {"pointX1":10,"pointY1":20, "pointX2":[10,20,20,30], "pointY2" : [11,20,33,50]}
     We assume that the lenght of pointX2 and pointY2 is same */
@@ -354,7 +374,11 @@ var clientCanvasOffset;
 var lineWidthC = 10;
 var lineStrokeStyleC = 'rgba(0, 100, 0, 0.25)';
 var img = new Image();
-function init_client(clientCanvasId) {
+var clientiframe;
+var clientCanvas;
+function init_client(clientCanvasId, clientiframeId) {
+    clientiframe = clientiframeId;
+    clientCanvas = clientCanvasId;
     el_client = document.getElementById(clientCanvasId);
     ctx_client = el_client.getContext('2d');
     clientCanvasOffset = $(clientCanvasId).offset();

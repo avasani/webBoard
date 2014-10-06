@@ -25,6 +25,8 @@
             <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-9">
                 <canvas id="pptCanvas" width="800" height="500" style="border:1px solid #000000;">
                 </canvas>
+                <iframe id="vnciframe" width="800" height="500" style="border:1px solid #000000;">
+                </iframe>
                 <!--  <button id="pptbtn">Click to zoom</button> -->
             </div>
             <div id="videodiv" class="col-xs-12 col-sm-8 col-md-3">
@@ -92,7 +94,7 @@
         e.video.width = $('#videos-container').width();
         e.video.height = $('#videos-container').height();
         if (e.video.id != 'self') {
-            init_client('pptCanvas');
+            init_client('pptCanvas', 'vnciframe');
             videoContainer.appendChild(e.video);
             $('#videos-container video').attr('controls', false);
         }
@@ -117,6 +119,11 @@
     window.onload = function() {
         getUser();
     };
+
+    $(document).ready(function() {
+        $("#pptCanvas").show();
+        $("#vnciframe").hide();
+    });
 
     function getUser() {
         ajaxGET('/getUsername', function(data) {

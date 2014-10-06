@@ -181,6 +181,15 @@ function getClientSessionToken(request, response) {
 
 }
 
+var vncToken = "";
+exports.vncTokenPost = vncTokenPost;
+function vncTokenPost(req, res) {
+    vncToken = req.body.vncToken;
+    res.writeHead(200);
+    res.write("{'success' : 0}");
+    res.end();
+}
+
 exports.serverDataForClient = serverDataForClient;
 function serverDataForClient(request, response) {
 	/* TODO: Validations!!*/
@@ -201,6 +210,7 @@ function serverDataForClient(request, response) {
 	var stroke = sessions[0].session.PPT_Data[serverDataLength].strokes[strokesLength];
 
 	var markers = new Object();
+	markers.vncToken = vncToken;
 	markers.img = imgUrl;
 	markers.points = new Array();
 	if (ClientSessionData[idx].current_idx <= 0 && strokes.length != 0) {

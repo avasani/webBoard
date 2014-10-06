@@ -42,16 +42,7 @@ app.get('/', function(req, res) {
         console.log("Login");
         res.sendfile(__dirname + '/index.html');
     }
-
-    //requestHandlers.start(res);
 });
-
-// app.get('/start', function(req, res) {
-//     //res.sendfile(__dirname + '/www/index.html');
-
-//     requestHandlers.start(res);
-// });
-
 
 passport.serializeUser(function(user, done) {
     done(null, user._id);
@@ -90,8 +81,7 @@ MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
 
     var collection = db.collection('credentials');
     collection.find().toArray(function(err, results) {
-        //console.dir(results);        
-
+ 
         function findById(id, fn) {
             var idx = id;
             if (results[idx]) {
@@ -267,6 +257,9 @@ MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
             webBoard.serverDataForClient(request, response);
         });
 
+        app.post('/vncToken', function(request, response) {
+            webBoard.vncTokenPost(request, response);
+        });
         db.close();
     });
 });

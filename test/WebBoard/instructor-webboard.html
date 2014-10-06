@@ -42,7 +42,7 @@
         <div class="row" style="margin-top:20px">
             <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-9">
                 <ul class="nav nav-tabs">
-                    <li class="nav active"><a href="#ppt" data-toggle="tab">Presentation</a>
+                    <li class="nav active"><a id="presentation" href="#ppt" data-toggle="tab">Presentation</a>
                     </li>
                     <li class="nav"><a id="vmLink" href="#vm" data-toggle="tab">VM</a>
                     </li>
@@ -84,6 +84,17 @@
 $('#vmLink').click(function(){
     virtualMachine();
 });
+
+$('#presentation').click(function(){
+        var datat = new Object();
+        datat.vncToken = "";
+        ajaxPOST('/vncToken', JSON.stringify(datat), function(d){
+            console.log("success");
+        }, function(err) {
+            console.log("Error");
+        });
+});
+
 function virtualMachine(){
     var url=prompt("Please enter the url","");
     if (url!=null){
@@ -97,8 +108,17 @@ function virtualMachine(){
         iframe.id="iframeId";
         iframe.setAttribute("src", url);
         $('#vm').append(iframe);
+        var datat = new Object();
+        datat.vncToken = url;
+        ajaxPOST('/vncToken', JSON.stringify(datat), function(d){
+            console.log("success");
+        }, function(err) {
+            console.log("Error");
+        });
    }
 }
+
+
 
 
 var hash = window.location.hash.replace('#', '');
@@ -386,6 +406,7 @@ $(document).ready(function() {
         img.src = slideUrl[current];
         addSlideByServer(slideUrl[current]);
     });
+
 });
 </script>
 
