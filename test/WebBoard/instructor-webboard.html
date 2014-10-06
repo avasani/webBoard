@@ -27,7 +27,7 @@
         </div>
         <div class="row" style="margin-top:20px">
             <div id="uploaddiv" class="col-xs-12 col-sm-12 col-md-12">
-                <form class="form-inline" id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
+                <form class="form-inline" enctype="multipart/form-data" id="uploadForm" action="javascript:processPost()">
                     <!-- <input type="file" id="userPhotoInput" name="displayImage" /> -->
                     <div class="form-group">
                         <input class="btn btn-default" type="file" id="upload" name="upload" />
@@ -166,28 +166,29 @@ function waitForPath() {
 }
 
 var path;
-$('#formSubmit').on('click', function() {
-    var fd = new FormData();
-    fd.append("upload", document.getElementById('upload').files[0]);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/upload", true);
-    xhr.setRequestHeader("Content-Type", "application/octet-stream");
-    xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
-    xhr.upload.addEventListener('progress', onprogressHandler, false);
-    //xhr.addEventListener('load', uploadComplete, false);
-    xhr.upload.addEventListener('load', onloadHandler, false);
-    xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
+var myfile = "";
 
-    // ajax.onreadystatechange = function() {
-    //     console.log("$$$$$$$$$$$ Ready Statess" + ajax.readyState);
-    //     if (ajax.readyState == 4 && (ajax.status == 200)) {
-    //         console.log("ready" + JSON.stringify(ajax.responseText));
-    //     }
-    // };
-    xhr.send(fd);
-    dummy();
-});
-
+function processPost() {
+        myfile = $('#upload').val();
+        var ext = myfile.split('.').pop();
+        if (ext == "pdf") {
+            console.log("$$$$$$$$$$ Reached");
+            var fd = new FormData();
+            fd.append("upload", document.getElementById('upload').files[0]);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/upload", true);
+            xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
+            xhr.upload.addEventListener('progress', onprogressHandler, false);
+            //xhr.addEventListener('load', uploadComplete, false);
+            xhr.upload.addEventListener('load', onloadHandler, false);
+            xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
+            xhr.send(fd);
+            dummy();
+        } else {
+            alert("Only pdf allowed");
+        }
+    }
+    
 // Handle the start of the transmission
 function onloadstartHandler(evt) {
     //var div = document.getElementById('upload-status');
@@ -223,17 +224,15 @@ function onreadystatechangeHandler(evt) {
         return;
     }
 
-    if (status == '200' && evt.target.responseText) {
-        var obj = jQuery.parseJSON(evt.target.responseText);
+    if (status == '200') {
+        //var obj = jQuery.parseJSON(evt.target.responseText);
         try {
-            var result = document.getElementById('result');
-            if (typeof obj.success === 'undefined')
-                result.innerHTML = 'Upgrade status: <strong style="color:red;">Failed</strong>' +
-                '<br><br>' +
-                'Note: Upgrade can fail even after upload is successful.' + '<br>' +
-                'One reason for upgrade failure is when the image uploaded is not of correct format/size.';
-            else
-                result.innerHTML = 'Upgrade status: <strong style="color:green;">Success</strong>';
+            console.log("Reached Hgere");
+            // //var result = document.getElementById('result');
+            // if (typeof obj.success === 'undefined')
+            //     result.innerHTML = '';
+            // else
+            //     result.innerHTML = 'Upgrade status: <strong style="color:green;">Success</strong>';
         } catch (err) {}
     }
 }
@@ -298,14 +297,19 @@ var current = 0;
 var slideUrl = new Array;
 
 function displayInCanavs() {
-    console.log(counter);
+    try {
+        console.log(counter);
 
-    for (var i = 0; i < counter; i++) {
-        slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
-        console.log(slideUrl[i]);
+        for (var i = 0; i < counter; i++) {
+            slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
+            console.log(slideUrl[i]);
+        }
+        img.src = slideUrl[0];
+        addSlideByServer(slideUrl[current]);
+    } catch (err) {
+        dummy();
     }
-    img.src = slideUrl[0];
-    addSlideByServer(slideUrl[current]);
+
 }
 
 $(document).ready(function() {

@@ -19,7 +19,7 @@
 <body>
 
     <div class="container">
-        <div id="getUsername" class="row" style="margin-bottom:20px;margin-right:20px">
+        <div id="getUsername" class="row" style="float:margin-bottom:20px;margin-right:20px">
         </div>
         <div class="row" style="margin-top:30px">
             <div id="pptdiv" class="col-xs-12 col-sm-8 col-md-9">
@@ -40,7 +40,6 @@
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
     var pptOn, videoOn;
-
     $('#videobtn').click(function() {
         if ($('#videodiv').hasClass('col-md-3')) {
             $('#videodiv').removeClass('col-md-3');
@@ -79,6 +78,8 @@
                 'height': '100%'
             });
          }
+          
+        
     });
 
     var hash = window.location.hash.replace('#', '');
