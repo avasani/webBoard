@@ -1,3 +1,12 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: Nodejs index file
+ */
+
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -13,8 +22,6 @@ var format = require('util').format;
 var passwordHash = require('password-hash');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
-
-
 
 app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
@@ -198,19 +205,9 @@ MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
             res.end();
         });
 
-        // app.get('/studentLogin', function(req, res) {
-        //     res.sendfile(__dirname + '/student-webboard.html');
-        // });
-
-
         app.get('/register.html', function(req, res) {
             res.sendfile(__dirname + '/register.html');
         });
-
-        //app.use(express.bodyParser());
-
-
-
 
         app.get('/student', function(req, res) {
             //res.sendfile(__dirname + '/www/index.html');

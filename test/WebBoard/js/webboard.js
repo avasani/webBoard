@@ -1,3 +1,11 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: Client side nodejs library
+ */
 
 /* Global functions */
 /* Use array.clear */
@@ -405,18 +413,3 @@ function init_client(clientCanvasId, clientiframeId, videoId, videoSrc) {
 
     startClient();
 }
-
-/*var ClientSlideUrl = "/images/background.png";
-$(document).ready(function() {
-    var contextS = document.getElementById('c').getContext("2d");
-    var contextC = document.getElementById('client').getContext("2d");
-    var img = new Image();
-    img.onload = function () {
-        contextS.drawImage(img, 0, 0, 800, 500);
-        contextC.drawImage(img, 0, 0, 800, 500);
-    }
-    img.src= ClientSlideUrl;
-    init();
-});
-
-*/

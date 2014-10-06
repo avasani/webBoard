@@ -1,3 +1,12 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: Nodejs webboard handling APIs
+ */
+
 var sessions = new Array();
 var sessionT = new Object();
 sessionT.session = new Object();
@@ -160,11 +169,6 @@ function userJoin(request, response) {
 			response.end();
 			console.log("User Joined the session :" + JSON.stringify(ClientObj));
 }
-
-/*
-app.post('/clientChangeSlide', function(request, response) {
-
-});
 
 /* Cliend ID is token ID :P */
 var tokenidx = 0;

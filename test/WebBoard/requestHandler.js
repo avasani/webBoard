@@ -1,3 +1,12 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: Nodejs request handlers callback functions
+ */
+
 var querystring = require("querystring");
 var formidable = require("formidable");
 var fs = require("fs");

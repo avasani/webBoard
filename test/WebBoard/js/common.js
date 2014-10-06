@@ -1,3 +1,12 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: Ajax APIs
+ */
+
 function ajaxPOST(url, postData, successCb, errorCb) {
     $.ajax({
         type: 'POST',

@@ -1,3 +1,12 @@
+/*
+ *
+ * Authors  : Ashwin Vasani <akvasani@asu.edu>
+ *            Ravinsingh Jain <rvjain@asu.edu>
+ *            Sagar Kalburgi <skalburg@asu.edu>
+ *
+ * Description: CSS helper script
+ */
+
 $(function(){
     $('.button-checkbox').each(function(){
 		var $widget = $(this),
