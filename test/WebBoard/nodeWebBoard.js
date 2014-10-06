@@ -15,23 +15,12 @@ function addSlide(request, response) {
 	console.log("Add Slide :" + JSON.stringify(request.body));
 	var idx = -1;
 	try{
-		/* We have keep the unique url */
-		for (i = 0;i < sessions[0].session.PPT_Data.length; i++) {
-			if (sessions[0].session.PPT_Data[i].img == request.body.image) {
-				idx = i;
-				break;
-			}
-		}
-
-		if (idx < 0) {
 			var image_meta_data = new Object();
 			image_meta_data.img = request.body.image;
 			image_meta_data.strokes = new Array();
 			sessions[0].session.PPT_Data.push(image_meta_data);
 			console.log("Added new image ");
-		} else {
-			console.log("Image is already added");
-		}
+
 	} catch (err) {
 		console.log("Err in setImage" + JSON.stringify(err));
 	}
@@ -55,12 +44,9 @@ function endSession(request, response) {
 			var idx = -1;
 			/* We have keep the unique url */
 			idx = -1;
-			for (i = 0;i < sessions[0].session.PPT_Data.length; i++) {
-				if (sessions[0].session.PPT_Data[i].img == request.body.image) {
-					idx = i;
-					break;
-				}
-			}
+			if (sessions[0].session.PPT_Data[sessions[0].session.PPT_Data.length - 1].img == request.body.image)
+					idx = sessions[0].session.PPT_Data.length - 1;
+			
 			if (idx < 0) {
 				var end = new Object();
 				end.endSession = true;
@@ -94,12 +80,8 @@ function serverData(request, response) {
 	}
 
 	var idx = -1;
-	for (var i = 0; i < serverDataLength; i++) {
-		if (sessions[0].session.PPT_Data[i].img == request.body.imgUrl) {
-			idx = i;
-			break;
-		}
-	}
+	if (sessions[0].session.PPT_Data[serverDataLength - 1].img == request.body.imgUrl)
+		idx = serverDataLength - 1;
 
 	var points = new Object();
 
