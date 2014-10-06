@@ -32,11 +32,14 @@ app.use(expressSession({
 app.get('/', function(req, res) {
     if (req.session.user) {
         if (req.session.user.role === "student") {
+            console.log("Student");
             res.sendfile(__dirname + '/student-webboard.html');
         } else {
+            console.log("instructor");
             res.sendfile(__dirname + '/instructor-webboard.html');
         }
     } else {
+        console.log("Login");
         res.sendfile(__dirname + '/index.html');
     }
 
@@ -154,10 +157,11 @@ MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
                         req.session.user = user;
                         //return res.redirect('/studentLogin');
                         res.sendfile(__dirname + '/student-webboard.html');
+                    } else {
+                        req.session.user = user;
+                        //return res.redirect('/start');
+                        res.sendfile(__dirname + '/instructor-webboard.html');
                     }
-                    req.session.user = user;
-                    //return res.redirect('/start');
-                    res.sendfile(__dirname + '/instructor-webboard.html');
                 });
             })(req, res, next);
         });
