@@ -233,6 +233,7 @@ function client_draw(pointX1, pointY1, pointX2, pointY2) {
 
 /* Ajax Success call back for client GET on /data */
 var isVNCLoaded = false;
+var isPPTLoaded = false;
 function client_got_data_cb(data) {
   var pointX1, pointY1;
   var pointX2 = []; pointY2 = [];
@@ -246,8 +247,14 @@ function client_got_data_cb(data) {
             $("#" + clientCanvas).hide();
             $("#" + clientiframe).show();
             document.getElementById(clientiframe).src = data.vncToken;
+            clientvideoSrc.video.play();
+            document.getElementById(clientvideoId).appendChild(clientvideoSrc.video);
+            //document.getElementById(clientvideoId).appendChild(clientvideoSrc.video);
+            //$('#'+clientvideoId +" video").attr('controls', false);
+            clientvideoSrc.video.play();           
             isVNCLoaded = true;
         }
+        isPPTLoaded = false;
         timeout = setTimeout(client_get_server_stroke, 500);
         return;
     }
@@ -257,6 +264,9 @@ function client_got_data_cb(data) {
   isVNCLoaded = false;
   $("#" + clientCanvas).show();
   $("#" + clientiframe).hide();
+
+  clientvideoSrc.video.play();
+  document.getElementById(clientvideoId).appendChild(clientvideoSrc.video);
   /* Lets fix the json format of data:
     {"pointX1":10,"pointY1":20, "pointX2":[10,20,20,30], "pointY2" : [11,20,33,50]}
     We assume that the lenght of pointX2 and pointY2 is same */
@@ -375,10 +385,12 @@ var lineWidthC = 10;
 var lineStrokeStyleC = 'rgba(0, 100, 0, 0.25)';
 var img = new Image();
 var clientiframe;
-var clientCanvas;
-function init_client(clientCanvasId, clientiframeId) {
+var clientCanvas, clientvideoId, clientvideoSrc;
+function init_client(clientCanvasId, clientiframeId, videoId, videoSrc) {
     clientiframe = clientiframeId;
     clientCanvas = clientCanvasId;
+    clientvideoId = videoId;
+    clientvideoSrc = videoSrc;
     el_client = document.getElementById(clientCanvasId);
     ctx_client = el_client.getContext('2d');
     clientCanvasOffset = $(clientCanvasId).offset();
