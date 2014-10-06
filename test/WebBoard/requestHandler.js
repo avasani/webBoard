@@ -83,7 +83,7 @@ function upload(req, res) {
     var target_path;
     console.log("Request handler upload was called.");
     var form = new formidable.IncomingForm();
-    form.uploadDir = __dirname+'/images/';
+    form.uploadDir = __dirname + '/images/';
 
     form.parse(req, function(error, fields, files) {
 
@@ -91,11 +91,11 @@ function upload(req, res) {
         console.log("parsing done");
         console.log("file size: " + JSON.stringify(files));
         var tmp_path = files.upload.path;
-        console.log("/temp path"+tmp_path);
+        console.log("/temp path" + tmp_path);
 
         // set where the file should actually exists - in this case it is in the "images" directory
-        var filePath = files.upload.name.replace(/[^a-zA-Z.]/g,"");
-        target_path = __dirname+'/images/' + filePath;
+        var filePath = files.upload.name.replace(/[^a-zA-Z.]/g, "");
+        target_path = __dirname + '/images/' + filePath;
         // move the file from the temporary location to the intended location
         fs.rename(tmp_path, target_path, function(err) {
             if (err) throw err;
@@ -113,7 +113,7 @@ function upload(req, res) {
         });
     });
     console.log("######REadched");
-//res.sendfile(__dirname + '/instructor-webboard.html');
+    //res.sendfile(__dirname + '/instructor-webboard.html');
 }
 
 function convert(target_path, dir, ii) {

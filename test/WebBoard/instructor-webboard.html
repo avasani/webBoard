@@ -41,12 +41,32 @@
         </div>
         <div class="row" style="margin-top:20px">
             <div id="instpptdiv" class="col-xs-12 col-sm-10 col-md-9">
-                <canvas id="serverCanvas" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
-                <br/>
-                <div style="width:800px">
-                    <button class="btn btn-default" id="previous">Previous</button>
-                    <button class="btn btn-default" id="next" style="float:right;">Next</button>
+                <ul class="nav nav-tabs">
+                    <li class="nav active"><a href="#ppt" data-toggle="tab">Presentation</a>
+                    </li>
+                    <li class="nav"><a href="#whiteboard" data-toggle="tab">WhiteBoard</a>
+                    </li>
+                    <li class="nav"><a href="#vm" data-toggle="tab">VM</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade in active" id="ppt">
+                        <canvas id="serverCanvas" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
+                        <br/>
+                        <div style="width:800px">
+                            <button class="btn btn-default" id="previous">Previous</button>
+                            <button class="btn btn-default" id="whiteslide" style="margin: 0 auto">Add White board</button>
+                            <button class="btn btn-default" id="next" style="float:right;">Next</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="whiteboard">
+                        <canvas id="serverCanvas_wb" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
+                    </div>
+                    <div class="tab-pane fade" id="vm">
+                        <canvas id="serverCanvas_vm" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
+                    </div>
                 </div>
+
             </div>
             <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-3">
                 <button class="btn btn-default" style="margin-bottom:5px;" id="setup-new-live-class">Start Session</button>
@@ -176,25 +196,26 @@ var path;
 var myfile = "";
 
 function processPost() {
-        myfile = $('#upload').val();
-        var ext = myfile.split('.').pop();
-        if (ext == "pdf") {
-            console.log("$$$$$$$$$$ Reached");
-            var fd = new FormData();
-            fd.append("upload", document.getElementById('upload').files[0]);
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/upload", true);
-            xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
-            xhr.upload.addEventListener('progress', onprogressHandler, false);
-            xhr.upload.addEventListener('load', onloadHandler, false);
-            xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
-            xhr.send(fd);
-            dummy();
-        } else {
-            alert("Only pdf allowed");
-        }
+    myfile = $('#upload').val();
+    var ext = myfile.split('.').pop();
+    if (ext == "pdf") {
+        console.log("$$$$$$$$$$ Reached");
+        var fd = new FormData();
+        fd.append("upload", document.getElementById('upload').files[0]);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/upload", true);
+        xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
+        xhr.upload.addEventListener('progress', onprogressHandler, false);
+        //xhr.addEventListener('load', uploadComplete, false);
+        xhr.upload.addEventListener('load', onloadHandler, false);
+        xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
+        xhr.send(fd);
+        dummy();
+    } else {
+        alert("Only pdf allowed");
     }
-    
+}
+
 // Handle the start of the transmission
 function onloadstartHandler(evt) {
     console.log("onloadstartHandler");
@@ -315,18 +336,29 @@ $(document).ready(function() {
         contextSrv.drawImage(img, 0, 0, 800, 500);
     }
 
+
+    $('#whiteslide').click(function() {
+        console.log(slideUrl.join());
+        slideUrl.splice(current+1, 0, "./images/white_image/white.jpg");
+        console.log(slideUrl.join());
+        counter++;
+        current++;
+        img.src = slideUrl[current];
+        addSlideByServer(slideUrl[current]);
+    });
+
     $('#next').click(function() {
-        console.log("next " + current +" "+ counter);
+        console.log("next " + current + " " + counter);
         if (current == counter - 1) {
             current = counter - 1;
         } else {
             current++;
             contextSrv.clearRect(0, 0, 800, 500);
-        img.src = null;
-        img.src = slideUrl[current];
-        addSlideByServer(slideUrl[current]);
+            img.src = null;
+            img.src = slideUrl[current];
+            addSlideByServer(slideUrl[current]);
         }
-        
+
     });
     $('#previous').click(function() {
         console.log("previous" + current);
