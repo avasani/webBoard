@@ -306,6 +306,7 @@ function displayInCanavs() {
         }
         img.src = slideUrl[0];
         addSlideByServer(slideUrl[current]);
+        current = 0;
     } catch (err) {
         dummy();
     }
@@ -324,16 +325,17 @@ $(document).ready(function() {
 
 
     $('#next').click(function() {
-        console.log("next" + current);
+        console.log("next " + current +" "+ counter);
         if (current == counter - 1) {
             current = counter - 1;
         } else {
             current++;
-        }
-        contextSrv.clearRect(0, 0, 800, 500);
+            contextSrv.clearRect(0, 0, 800, 500);
         img.src = null;
         img.src = slideUrl[current];
         addSlideByServer(slideUrl[current]);
+        }
+        
     });
     $('#previous').click(function() {
         console.log("previous" + current);
