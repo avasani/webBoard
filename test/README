@@ -28,13 +28,11 @@ First you need to register yourself using the 'Register' button on the login for
 are done, you can login using your credentials.
 
 To run this appplication on the local machine, do the following.
-$ npm install 
-$ sudo apt-get install npm 
-$ sudo apt-get install nodejs-dev 
-$ sudo apt-get install npm  
+$ sudo apt-get install npm nodejs-dev
+$ npm install
 $ npm install connect formidable spindrift pdfkit passport passport-local poppler-glib \
       libpoppler-glib-dev pdfutils mongodb password-hash util mkpath easyimage multiparty \
-       --save fs-extra
+       --save fs-extra express-session cookie-parser
 
 $ apt-get install imagemagick
 
