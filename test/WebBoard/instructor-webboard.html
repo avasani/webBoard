@@ -44,9 +44,7 @@
                 <ul class="nav nav-tabs">
                     <li class="nav active"><a href="#ppt" data-toggle="tab">Presentation</a>
                     </li>
-                    <li class="nav"><a href="#whiteboard" data-toggle="tab">WhiteBoard</a>
-                    </li>
-                    <li class="nav"><a href="#vm" data-toggle="tab">VM</a>
+                    <li class="nav"><a id="vmLink" href="#vm" data-toggle="tab">VM</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -59,11 +57,8 @@
                             <button class="btn btn-default" id="next" style="float:right;">Next</button>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="whiteboard">
-                        <canvas id="serverCanvas_wb" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
-                    </div>
                     <div class="tab-pane fade" id="vm">
-                        <canvas id="serverCanvas_vm" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas>
+                        <!-- <canvas id="serverCanvas_vm" width="800" height="500" style="border:2px solid #bdc3c7;"></canvas> -->
                     </div>
                 </div>
 
@@ -85,6 +80,27 @@
 
 </body>
 <script type="text/javascript">
+//For VM
+$('#vmLink').click(function(){
+    virtualMachine();
+});
+function virtualMachine(){
+    var url=prompt("Please enter the url","");
+    if (url!=null){
+        if($('#iframeId').length){
+            $('#iframeId').remove();
+        }
+        var iframe = document.createElement('iframe');
+        iframe.frameBorder=2;
+        iframe.width="800px";
+        iframe.height="500px";
+        iframe.id="iframeId";
+        iframe.setAttribute("src", url);
+        $('#vm').append(iframe);
+   }
+}
+
+
 var hash = window.location.hash.replace('#', '');
 var meeting = new Meeting(hash);
 
