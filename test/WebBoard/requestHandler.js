@@ -112,6 +112,8 @@ function upload(req, res) {
             });
         });
     });
+    console.log("######REadched");
+res.sendfile(__dirname + '/instructor-webboard.html');
 }
 
 function convert(target_path, dir, ii) {

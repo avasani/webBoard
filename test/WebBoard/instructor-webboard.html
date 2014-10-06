@@ -36,7 +36,7 @@
                         <input class="btn btn-default" type="submit" value="Upload">
                     </div>
                 </form>
-
+                <!-- <div id="loading">Loading...</div> -->
             </div>
         </div>
         <div class="row" style="margin-top:20px">
@@ -170,12 +170,75 @@ $('#formSubmit').on('click', function() {
     var fd = new FormData();
     fd.append("upload", document.getElementById('upload').files[0]);
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", uploadComplete, false);
-    xhr.open("POST", "/upload");
+    xhr.open("POST", "/upload", true);
+    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+    xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
+    xhr.upload.addEventListener('progress', onprogressHandler, false);
+    //xhr.addEventListener('load', uploadComplete, false);
+    xhr.upload.addEventListener('load', onloadHandler, false);
+    xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
 
+    // ajax.onreadystatechange = function() {
+    //     console.log("$$$$$$$$$$$ Ready Statess" + ajax.readyState);
+    //     if (ajax.readyState == 4 && (ajax.status == 200)) {
+    //         console.log("ready" + JSON.stringify(ajax.responseText));
+    //     }
+    // };
     xhr.send(fd);
-
+    dummy();
 });
+
+// Handle the start of the transmission
+function onloadstartHandler(evt) {
+    //var div = document.getElementById('upload-status');
+    //div.innerHTML = upgrade_target + ' upload started!';
+    console.log("onloadstartHandler");
+}
+
+// Handle the end of the transmission
+function onloadHandler(evt) {
+    //var div = document.getElementById('progress');
+    // div.innerHTML = 'Progress: 100%';
+
+    // div = document.getElementById('upload-status');
+    // div.innerHTML = upgrade_target + ' upload successful!';
+    console.log("onloadHandler");
+}
+
+// Handle the progress
+function onprogressHandler(evt) {
+    // var div = document.getElementById('progress');
+    // var percent = (evt.loaded / evt.total * 100).toFixed(0);
+    // div.innerHTML = 'Progress: ' + percent + '%';
+    console.log("onprogressHandler");
+}
+
+
+function onreadystatechangeHandler(evt) {
+    var status = null;
+
+    try {
+        status = evt.target.status;
+    } catch (e) {
+        return;
+    }
+
+    if (status == '200' && evt.target.responseText) {
+        var obj = jQuery.parseJSON(evt.target.responseText);
+        try {
+            var result = document.getElementById('result');
+            if (typeof obj.success === 'undefined')
+                result.innerHTML = 'Upgrade status: <strong style="color:red;">Failed</strong>' +
+                '<br><br>' +
+                'Note: Upgrade can fail even after upload is successful.' + '<br>' +
+                'One reason for upgrade failure is when the image uploaded is not of correct format/size.';
+            else
+                result.innerHTML = 'Upgrade status: <strong style="color:green;">Success</strong>';
+        } catch (err) {}
+    }
+}
+
+
 var timeout;
 
 function dummy() {
@@ -224,6 +287,9 @@ function uploadComplete(evt) {
     console.log("Reached in complete");
     alert(evt.target.responseText);
 }
+
+
+
 var myCanvas = document.getElementById('serverCanvas');
 var instDiv = document.getElementById('instpptdiv');
 var contextSrv = document.getElementById('serverCanvas').getContext("2d");
