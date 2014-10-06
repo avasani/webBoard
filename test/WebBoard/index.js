@@ -31,7 +31,7 @@ app.use(expressSession({
 /* Send the index file for "/" */
 app.get('/', function(req, res) {
     if (req.session.user) {
-        if (req.session.user.role === "student") {
+        if (req.session.user.role == "student") {
             console.log("Student");
             res.sendfile(__dirname + '/student-webboard.html');
         } else {
