@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div id="instvideodiv" class="col-xs-12 col-sm-2 col-md-3">
-                <button class="btn btn-default" style="margin-bottom:5px;" id="setup-new-live-class">Setup New Live Session</button>
+                <button class="btn btn-default" style="margin-bottom:5px;" id="setup-new-live-class">Start Session</button>
                 <section id="videos-container">
             </div>
         </div>
@@ -72,10 +72,15 @@ var videoContainer = document.getElementById('videos-container');
 var videoChildContainer = document.getElementById('videos-child-container');
 
 // on getting media stream
+var selfAdded = false;
 meeting.onaddstream = function(e) {
     e.video.width = 200;
     e.video.height = 200;
     if (e.video.id == "self") {
+        if (selfAdded)
+                return;
+        selfAdded = true;
+        $('#setup-new-live-class').text("Stop Session");
         videoContainer.appendChild(e.video);
         $('#videos-container video').attr('controls', false);
         $('#videos-container video').css({
@@ -102,6 +107,8 @@ meeting.firebase = 'rtcweb';
 meeting.onuserleft = function(userid) {
     var video = document.getElementById(userid);
     if (video) video.parentNode.removeChild(video);
+    if (video.id == "self")
+        selfAdded = false;
 };
 
 var is_started = false;
@@ -114,22 +121,22 @@ function successCb(data) {
 function errorCb(err) {
     console.log(err);
 }
-document.getElementById('setup-new-live-class').onclick = function() {
-    // setup new meeting room
-    if (is_started) {
-        console.log("Stopping now");
-        $("#setup-new-live-class").text("Start Again");
-        /* TODO: Stop code */
-        return;
-    }
-    meeting.setup('Class-ASU');
-    this.disabled = true;
-    var postData = new Object();
-    postData.sessionURL = location.href;
-    //ajaxPOST("sessionURL", JSON.stringify(postData), successCb, errorCb);
 
-    $("#setup-new-live-class").text("Stop Session");
-};
+$('#setup-new-live-class').click(function() {
+    // setup new meeting room
+    $(this).text(function(i, text){
+            if (text === "Stop Session") {
+                window.location.href="/";
+            } else {
+                console.log(" Class Name" + className);
+                meeting.setup("ASUID");
+                var postData = new Object();
+                postData.sessionURL = location.href;
+                ajaxPOST("sessionURL", JSON.stringify(postData), successCb, errorCb);
+            }
+            return text === "Start Session" ? "Stop Session" : "Start Session";
+    })
+});
 </script>
 <script type="text/javascript">
 var pathOfImages;
@@ -179,7 +186,6 @@ function processPost() {
             xhr.open("POST", "/upload", true);
             xhr.upload.addEventListener('loadstart', onloadstartHandler, false);
             xhr.upload.addEventListener('progress', onprogressHandler, false);
-            //xhr.addEventListener('load', uploadComplete, false);
             xhr.upload.addEventListener('load', onloadHandler, false);
             xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
             xhr.send(fd);
@@ -191,26 +197,16 @@ function processPost() {
     
 // Handle the start of the transmission
 function onloadstartHandler(evt) {
-    //var div = document.getElementById('upload-status');
-    //div.innerHTML = upgrade_target + ' upload started!';
     console.log("onloadstartHandler");
 }
 
 // Handle the end of the transmission
 function onloadHandler(evt) {
-    //var div = document.getElementById('progress');
-    // div.innerHTML = 'Progress: 100%';
-
-    // div = document.getElementById('upload-status');
-    // div.innerHTML = upgrade_target + ' upload successful!';
     console.log("onloadHandler");
 }
 
 // Handle the progress
 function onprogressHandler(evt) {
-    // var div = document.getElementById('progress');
-    // var percent = (evt.loaded / evt.total * 100).toFixed(0);
-    // div.innerHTML = 'Progress: ' + percent + '%';
     console.log("onprogressHandler");
 }
 
@@ -225,14 +221,8 @@ function onreadystatechangeHandler(evt) {
     }
 
     if (status == '200') {
-        //var obj = jQuery.parseJSON(evt.target.responseText);
         try {
             console.log("Reached Hgere");
-            // //var result = document.getElementById('result');
-            // if (typeof obj.success === 'undefined')
-            //     result.innerHTML = '';
-            // else
-            //     result.innerHTML = 'Upgrade status: <strong style="color:green;">Success</strong>';
         } catch (err) {}
     }
 }
@@ -254,11 +244,13 @@ window.onload = function() {
     getUser();
 };
 
+var className;
 function getUser() {
     ajaxGET('/getUsername', function(data) {
             $('#getUsername').css({
                 "float": "right"
             });
+            className = data.user.fname+data.lname;
             $('#getUsername').text("Hello " + data.user.fname + " " + data.user.lname + "  ");
             var r = $('<input type="button" class="btn btn-default" id="logout" value="Logout"/>');
             $('#getUsername').append(r);
@@ -322,7 +314,6 @@ $(document).ready(function() {
         document.getElementById('serverCanvas').width = 800;
         contextSrv.drawImage(img, 0, 0, 800, 500);
     }
-
 
     $('#next').click(function() {
         console.log("next " + current +" "+ counter);
