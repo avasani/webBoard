@@ -6,6 +6,9 @@
  *
  *References: How To Connect Node.js to a MongoDB Database on a VPS
  *            https://www.digitalocean.com/community/tutorials/how-to-connect-node-js-to-a-mongodb-database-on-a-vps
+              Implementing password hashing
+              https://www.npmjs.org/package/password-hash
+              
  * Description: Nodejs index file
  */
 
