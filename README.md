@@ -76,11 +76,11 @@ are done, you can login using your credentials.
 </pre>
 Open the application with the path as 127.0.0.1:3000
 
-##References: ##
+## References: ##
 <pre>
 How To Connect Node.js to a MongoDB Database on a VPS
 https://www.digitalocean.com/community/tutorials/how-to-connect-node-js-to-a-mongodb-database-on-a-vps
  
 Implementing password hashing
 https://www.npmjs.org/package/password-hash
-</pre>          
+</pre>
