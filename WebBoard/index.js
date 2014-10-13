@@ -6,6 +6,7 @@
  *
  * References: How To Connect Node.js to a MongoDB Database on a VPS
  *             https://www.digitalocean.com/community/tutorials/how-to-connect-node-js-to-a-mongodb-database-on-a-vps
+ 
  *             Implementing password hashing
  *             https://www.npmjs.org/package/password-hash
  *            
@@ -66,10 +67,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 app.post('/register.html', function(request, response) {
+
+/*Connecting to database and storing the user registration details into it, source: mentioned in references section above*/
+
     MongoClient.connect('mongodb://127.0.0.1:27017/webboard', function(err, db) {
         if (err) throw err;
 
         var collection = db.collection('credentials');
+        
+        /*Hashing passwords before storing, source: mentioned in references section above*/
         var hashedPassword = passwordHash.generate(request.body.password);
         collection.insert({
             fname: request.body.first_name,
