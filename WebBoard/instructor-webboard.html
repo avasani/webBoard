@@ -200,6 +200,7 @@ var counter;
 var check = true;
 var server_started = false;
 
+// Wait till the pdf is converted into images
 function waitForPath() {
     $.ajax({
         type: 'GET',
@@ -231,6 +232,7 @@ function waitForPath() {
 var path;
 var myfile = "";
 
+// Upload PDF
 function processPost() {
     myfile = $('#upload').val();
     var ext = myfile.split('.').pop();
@@ -287,7 +289,7 @@ function onreadystatechangeHandler(evt) {
 
 
 var timeout;
-
+// Background function to check if the pdf is converted into image
 function dummy() {
     timeout = setTimeout(function() {
         clearTimeout(timeout);
@@ -296,6 +298,8 @@ function dummy() {
             dummy();
     }, 3000);
 }
+
+// Find the username from the user session to dispay it on the portal
 window.onload = function() {
     getUser();
 };
@@ -344,6 +348,7 @@ var img = new Image();
 var current = 0;
 var slideUrl = new Array;
 
+// Store all images and also add them to the server
 function displayInCanavs() {
     try {
         console.log(counter);
@@ -371,7 +376,7 @@ $(document).ready(function() {
         contextSrv.drawImage(img, 0, 0, 800, 500);
     }
 
-
+    // Add White Space
     $('#whiteslide').click(function() {
         console.log(slideUrl.join());
         slideUrl.splice(current+1, 0, "./images/white_image/white.jpg");
@@ -382,6 +387,7 @@ $(document).ready(function() {
         addSlideByServer(slideUrl[current]);
     });
 
+    // Add Next button action handler
     $('#next').click(function() {
         console.log("next " + current + " " + counter);
         if (current == counter - 1) {
@@ -395,6 +401,8 @@ $(document).ready(function() {
         }
 
     });
+
+    // Add Previous button action handler
     $('#previous').click(function() {
         console.log("previous" + current);
         if (current == 0) {

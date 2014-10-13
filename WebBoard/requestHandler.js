@@ -34,6 +34,7 @@ fs.readFile('./instructor-webboard.html', function(err, html) {
     instructorhtml = html;
 });
 
+// For testing only
 function start(response) {
     console.log("Request handler start was called.");
     response.writeHead(200, {
@@ -77,6 +78,7 @@ function getDirectory(dir, files_) {
     return files_;
 }
 
+// Send the dirpath to the user
 function dirPath(req, res) {
     var sendData = new Object();
     //sendData.path = getDirectory("./images");
@@ -88,6 +90,7 @@ function dirPath(req, res) {
     res.end();
 }
 
+// Upload request handler
 function upload(req, res) {
     var target_path;
     console.log("Request handler upload was called.");
@@ -125,6 +128,7 @@ function upload(req, res) {
     //res.sendfile(__dirname + '/instructor-webboard.html');
 }
 
+// Convert file into image
 function convert(target_path, dir, ii) {
     console.log(ii);
     exec("/usr/bin/gs -dQUIET -dPARANOIDSAFER -dBATCH -dNOPAUSE -dNOPROMPT -sDEVICE=jpeg -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r72 -dFirstPage=" + ii + " -dLastPage=" + ii + " -sOutputFile=./images/" + dir + "/out" + ii + ".jpeg " + target_path, function(error, stdout, stderr) {

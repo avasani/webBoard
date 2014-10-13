@@ -22,6 +22,7 @@ var lineStrokeStyleS = 'rgba(0, 100, 0, 0.25)';
 var SpointX1, SpointY1;
 var SpointX2 = [], SpointY2 = [];   
 
+/* Below functions handles touch events*/
 function doTouchStart(evt) {
     var serverCanvasOffset = el.getBoundingClientRect();
   
@@ -84,6 +85,7 @@ function doTouchMove(evt) {
     }
 }
 
+/* Mouse event */
 function onmousedown(e) {
   var serverCanvasOffset = el.getBoundingClientRect();
 
