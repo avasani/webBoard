@@ -28,8 +28,6 @@ Project Proposal:
 
 http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_WebBoard_ProjectProposal_RSA.docx
 http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_WebBoard_ProjectProposal_RSA.pdf
-
-PowerPoint Presentation:
 http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_Project_WebBoard_Ashwin_Ravin_Sagar.ppt
 
 Midterm Progress Report:
@@ -44,6 +42,10 @@ http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_WebBoard_Final_Proj
 http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_WebBoard_Final_ProjectReport_RSA_Group.pdf
 http://mobisphere.asu.edu/classta/webboard/raw/master/CSE591_Project_FinalReport_Ashwin_Ravin_Sagar_Final.ppt
 
+Source Code:
+
+http://mobisphere.asu.edu/classta/webboard/repository/archive.zip?ref=master
+
 Note: Test report is present in the final project report
 
 ## WebBoard: ##
@@ -56,31 +58,38 @@ either the student or instructor page.
 First you need to register yourself using the 'Register' button on the login form. Once you
 are done, you can login using your credentials.
 
-## To run this application on the local machine for first time, do the following. ##
-<pre>
+## Installation ##
+```Unix
    $ cd WebBoard
 
    $ sudo apt-get install npm nodejs-dev
 
    $ npm install
 
-   $ npm install connect formidable spindrift pdfkit passport passport-local pdfutils mongodb \
-   password-hash util mkpath easyimage multiparty --save fs-extra express-session cookie-parser body-parser
+   $ npm install connect formidable spindrift pdfkit passport passport-local pdfutils mongodb password-hash util mkpath easyimage multiparty --save fs-extra express-session cookie-parser body-parser
 
    $ apt-get install imagemagick
-
+```
 </pre>
 ## Execution: ##
-<pre>
+```Unix
    $ nodejs index.js
-</pre>
+```
+
 Open the application with the path as 127.0.0.1:3000
 
 ## References: ##
 <pre>
-How To Connect Node.js to a MongoDB Database on a VPS
+How To Connect Node.js to a MongoDB Database on a VPS :
 https://www.digitalocean.com/community/tutorials/how-to-connect-node-js-to-a-mongodb-database-on-a-vps
  
-Implementing password hashing
+Implementing password hashing: 
 https://www.npmjs.org/package/password-hash
+
+WebRTC Library meeting.js:
+https://github.com/muaz-khan/WebRTC-Experiment
+
+Nodejs Deployment on Heroku Cloud:
+https://devcenter.heroku.com/articles/getting-started-with-nodejs
+
 </pre>
