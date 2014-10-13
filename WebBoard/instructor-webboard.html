@@ -246,6 +246,7 @@ function processPost() {
         xhr.upload.addEventListener('load', onloadHandler, false);
         xhr.addEventListener('readystatechange', onreadystatechangeHandler, false);
         xhr.send(fd);
+        check = true;
         dummy();
     } else {
         alert("Only pdf allowed");
@@ -296,8 +297,6 @@ function dummy() {
     }, 3000);
 }
 window.onload = function() {
-    dummy();
-    //window.location.assign("/");
     getUser();
 };
 
@@ -310,7 +309,7 @@ function getUser() {
             className = data.user.fname+data.lname;
             $('#getUsername').text("Hello " + data.user.fname + " " + data.user.lname + "  ");
             var r = $('<input type="button" class="btn btn-default" id="logout" value="Logout"/>');
-            $('#getUsername').append(r);
+            $('#d').append(r);
             $('#logout').on('click', function() {
                 console.log("Hello logout");
                 ajaxGET('/logout', function(data) {
@@ -348,7 +347,7 @@ var slideUrl = new Array;
 function displayInCanavs() {
     try {
         console.log(counter);
-
+        slideUrl = [];
         for (var i = 0; i < counter; i++) {
             slideUrl.push("./images/" + pathOfImages + "/out" + (i + 1) + ".jpeg");
             console.log(slideUrl[i]);
